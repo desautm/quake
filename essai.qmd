@@ -1,0 +1,24 @@
+---
+title: "Essai"
+format: revealjs
+---
+
+## Essai
+
+{| class="wikitable" style="text-align:center;"
+|-
+! Nombre en binaire
+| colspan=7 | 1010110101010110011110111
+|-
+! Groupes de 4 chiffres binaires, en partant de la droite
+| 1 || 0101 || 1010 || 1010 || 1100 || 1111 || 0111
+|-
+! Chiffres hexadécimaux
+| 1 || 5 || A || A || C || F || 7
+|-
+! Nombre en hexadécimal
+| colspan=7 | 15AACF7
+|-
+! Nombre en décimal (cf. ci-dessous)
+| colspan=7 | 22719735
+|}

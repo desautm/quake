@@ -1,26 +1,1888 @@
 ---
 title: "Les mathématiques de Quake"
 author: "Marc-André Désautels"
-format: revealjs
+format: 
+  revealjs:
+    incremental: true
+editor: visual
+title-slide-attributes:
+  data-background-color: "black"
+execute: 
+  cache: true
+highlight-style: github-dark
 ---
 
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
-
-## Bullets
-
-When you click the **Render** button a document will be generated that includes:
-
--   Content authored with markdown
--   Output from executable code
-
-## Code
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
+```{python}
+#| label: setup
+import numpy as np
+import matplotlib.pyplot as plt
 ```
+
+# {background-image="https://upload.wikimedia.org/wikipedia/en/a/a1/Quake3Title.jpg"
+background-color="black"
+background-size="contain"}
+
+# {background-image="https://upload.wikimedia.org/wikipedia/en/8/89/Quake_III_Arena_q3dm0.png?20190418194223"
+background-color="black"
+background-size="contain"}
+
+# {background-color="black"}
+
+<iframe width="1050" height="700" src="https://www.youtube.com/embed/cyCgMQvG_rc?si=xrWC5hIPbnYKH1XR&amp;start=23" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+## Quake III Arena
+
+- **Quake III Arena** est un jeu vidéo de tir à la première personne développé par *id Software* et publié par *Activision* sur PC le 2 décembre 1999. 
+- **Quake III** se déroule dans un univers de science-fiction dans lequel le joueur incarne un combattant participant à un tournoi de combats à mort. 
+- Le jeu se focalise sur l'aspect multijoueur.
+
+## Quake III Arena
+
+- Le code source de **Quake III** a été diffusé après la *QuakeCon 2005*.
+- On découvre bientôt une fonction étrange: `Q_rsqrt`.
+- Cette fonction était déjà apparue sur *Usenet* et sur d'autres forums dès 2002/2003.
+
+## `Q_rsqrt`
+
+. . .
+
+L'inverse de la racine carrée, $\frac{1}{\sqrt{x}}$.
+
+. . .
+
+```{.c}
+float Q_rsqrt( float number )
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	y = number;
+	i = * ( long * ) &y; // evil floating point bit level hacking
+	i = 0x5f3759df - ( i >> 1 ); // what the fuck?
+	y = * ( float * ) &i;
+	y = y * ( threehalfs - ( x2 * y * y ) ); // 1st iteration
+//	y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
+
+	return y;
+}
+```
+
+## Motivation
+
+:::: {.columns}
+
+::: {.column width="60%"}
+::: {.nonincremental}
+- Les inverses des racines carrées d'un nombre à virgule flottante sont utilisées pour calculer un vecteur normalisé.
+- En synthèse d'image 3D, ces vecteurs normalisés sont utilisés pour déterminer l'éclairage et l'ombrage.
+- Des millions de ces calculs sont ainsi nécessaires chaque seconde.
+:::
+:::
+
+::: {.column width="40%"}
+![Normales à la surface](https://upload.wikimedia.org/wikipedia/commons/f/f6/Surface_normal.png)
+:::
+
+::::
+
+## Motivation
+
+- Soit un vecteur $\vec{v}=(v_1,v_2,v_3)$.
+- Sa norme est donnée par $||\vec{v}||=\sqrt{v_1^2+v_2^2+v_3^2}$.
+- Le vecteur unitaire est donc $\frac{\vec{v}}{||\vec{v}||}=\frac{\vec{v}}{\sqrt{v_1^2+v_2^2+v_3^2}}$
+
+## `Q_sqrt`
+
+```{.c code-line-numbers="|9-12"}
+float Q_rsqrt( float number )
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5F;
+
+	x2 = number * 0.5F;
+	y = number;
+	i = * ( long * ) &y; // evil floating point bit level hacking
+	i = 0x5f3759df - ( i >> 1 ); // what the fuck?
+	y = * ( float * ) &i;
+	y = y * ( threehalfs - ( x2 * y * y ) ); // 1st iteration
+//	y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed
+
+	return y;
+}
+```
+
+## `Python`
+
+```{python}
+#| echo: true
+
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+## Est-ce que cette approximation est bonne?
+
+## Est-ce que cette approximation est bonne?
+
+```{python, message="false"}
+#| fig-align: "center"
+
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+
+x = np.linspace(0.1, 10, 500)
+y1 = 1./np.sqrt(x)
+y2 = [Q_rsqrt(i) for i in x]
+ax.plot(x, y1, color = "blue", label = "VRAIE")
+ax.plot(x, y2, color = "red", label = "APPROXIMATION")
+
+plt.title("L'inverse de la racine carrée et son approximation")
+plt.xlabel("x")
+plt.ylabel("y")
+
+plt.legend()
+plt.show()
+```
+
+## Est-ce que cette approximation est bonne?
+
+```{python}
+#| fig-align: "center"
+
+fig, ax = plt.subplots()
+
+x = np.linspace(0.1, 10, 500)
+y1 = 1./np.sqrt(x)
+y2 = [Q_rsqrt(i) for i in x]
+ax.plot(x, y1, color = "blue", label = "VRAIE")
+ax.plot(x, y2, color = "red", label = "APPROXIMATION")
+
+xmin, xmax, ymin, ymax = (0.95, 1.05, 0.98, 1.02)
+axin1 = ax.inset_axes([0.4, 0.4, 0.5, 0.5], xlim = (xmin, xmax), ylim = (ymin, ymax))
+axin1.plot(x, y1, color = "blue")
+axin1.plot(x, y2, color = "red")
+ax.indicate_inset_zoom(axin1, edgecolor="black")
+
+plt.title("L'inverse de la racine carrée et son approximation")
+plt.xlabel("x")
+plt.ylabel("y")
+
+plt.legend()
+plt.show()
+```
+
+# La représentation des nombres {background-color="black" background-position="center"}
+
+## Système de numération
+
+Un **système de numération** permet de compter des objets et de les représenter par des nombres. Un système de numération **positionnel** possède trois éléments :
+
+-   Base $b$ (un entier supérieur à 1)
+
+-   Symboles (digits) : 0, 1, 2, ..., $b-1$
+
+-   Poids des symboles selon la position et la base, où poids=base<sup>position</sup>
+
+## Représentation polynomiale
+
+Le système positionnel utilise la **représentation polynomiale**. Celle-ci est donnée par: 
+
+$$
+\begin{aligned}
+(a_na_{n-1}\ldots a_1a_0,a_{-1}a_{-2}\ldots a_{-m})_b &= \sum_{k=-m}^n a_k b^k
+\end{aligned}
+$$ 
+
+où $b$ est la **base** et les $a_i$ sont des **coefficients** (les symboles de votre système de numération).
+
+## Représentation binaire
+
+-   Base = 2
+-   Symboles ordonnés qu'on nomme les *chiffres* : 0, 1.
+-   Le poids des symboles est donné par 2<sup>position</sup>
+
+. . .
+
+Par exemple:
+
+$$
+\begin{align}
+(1 \ 0100\ 1111)_2 &= 1\cdot 2^8 + 1\cdot 2^6 + 1\cdot 2^3 + 1\cdot 2^2 + \\
+& \qquad + 1\cdot 2^1 + 1\cdot 2^0 \\
+&= (335)_{10}
+\end{align}
+$$
+
+## Représentation binaire
+
+-   On précède le nombre par `0b` si on veut identifier un nombre sous forme binaire en `Python`.
+
+. . .
+
+Par exemple:
+
+```{python}
+#| echo: true
+
+a = 101001111
+b = 0b101001111
+print(a, b)
+```
+
+## Représentation hexadécimale
+
+-   Base = 16
+-   Symboles ordonnés qu'on nomme les *chiffres* : 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F.
+-   Le poids des symboles est donné par 16<sup>position</sup>
+
+. . .
+
+Par exemple:
+
+$$
+\begin{align}
+(14F)_{16} &= 1\cdot 16^2 + 4\cdot 16^1 + 15\cdot 2^0 \\
+&= (335)_{10}
+\end{align}
+$$
+
+## Représentation hexadécimale
+
+-   On précède le nombre par `0x` si on veut identifier un nombre sous forme hexadécimale en `Python`.
+
+. . .
+
+Par exemple:
+
+```{python}
+#| echo: true
+
+a = 335
+b = 0x14f
+print(a, b)
+```
+
+## Les trains de bits
+
+- Les ordinateurs utilisent des bits pour emmagasiner de l'information. 
+
+- Un bit peut prendre la valeur 0 ou la valeur 1.
+
+- L'information est emmagasinée dans des trains de bits ($T_n$) de longueur $n$ (une succession de $n$ bits).
+
+- $T_4 = 0110$
+
+# Les entiers non signés {background-color="black" background-position="center"}
+
+## Les entiers non signés
+
+::: {.callout-note}
+## Entiers non signés
+
+La représentation binaire non signée sur $n$ bits d’un entier $x$ est le train de bits correspondant à l’écriture de $x$ en base 2.
+
+:::
+
+. . .
+
+Par exemple, en utilisant 8 bits:
+
+. . .
+
+```{r engine='tikz'}
+\usetikzlibrary{matrix}
+\begin{tikzpicture}
+
+\tikzstyle{exposant}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white
+                    ]
+
+\matrix [column sep=0cm, row sep = 0.1cm]
+{
+    \node (a-7) [exposant] {1};
+  & \node (a-6) [exposant] {1};
+  & \node (a-5) [exposant] {0};
+  & \node (a-4) [exposant] {0};
+  & \node (a-3) [exposant] {1};
+  & \node (a-2) [exposant] {1};
+  & \node (a-1) [exposant] {0};
+  & \node (a-0) [exposant] {0};
+\\
+};
+
+\foreach \i in {0,1,...,7}{
+    \node[below] at ([shift=({0cm,-0.01cm})]a-\i.south) {\tiny{$2^\i$}};
+}
+
+\node[right] at ([shift=({0.01cm,0cm})]a-0.east) {$=204$};
+
+\end{tikzpicture}
+```
+
+
+# Les entiers signés {background-color="black" background-position="center"}
+
+## Entiers signés
+
+::: {.callout-note}
+## Entiers signés
+
+La représentation binaire signée sur $n$ bits d’un entier est le train de bit où le premier bit de gauche représente le signe (**positif** si le bit est 0 et **négatif** si le bit est 1), et où les $n-1$ bits restants représentent l'écriture de $|x|$ en base 2.
+
+:::
+
+. . .
+
+Par exemple sur huit bits:
+
+. . .
+
+```{r engine='tikz'}
+\usetikzlibrary{matrix}
+\begin{tikzpicture}
+
+\tikzstyle{signe}=[
+                        draw, 
+                        very thick, 
+                        fill=red!20!white
+                    ]
+
+\tikzstyle{exposant}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white
+                    ]
+
+\matrix [column sep=0cm, row sep = 0.1cm]
+{
+    \node (a-7) [signe] {0};
+  & \node (a-6) [exposant] {1};
+  & \node (a-5) [exposant] {0};
+  & \node (a-4) [exposant] {0};
+  & \node (a-3) [exposant] {1};
+  & \node (a-2) [exposant] {1};
+  & \node (a-1) [exposant] {0};
+  & \node (a-0) [exposant] {0};
+\\
+};
+
+\foreach \i in {0,1,...,6}{
+    \node[below] at ([shift=({0cm,-0.01cm})]a-\i.south) {\tiny{$2^\i$}};
+}
+
+\node[below, red] at ([shift=({0cm,-0.06cm})]a-7.south) {\tiny{signe}};
+\node[right] at ([shift=({0.01cm,0cm})]a-0.east) {$=76$};
+
+\end{tikzpicture}
+```
+
+## Entiers signés
+
+::: {.callout-note}
+## Entiers signés
+
+La représentation binaire signée sur $n$ bits d’un entier est le train de bit où le premier bit de gauche représente le signe (**positif** si le bit est 0 et **négatif** si le bit est 1), et où les $n-1$ bits restants représentent l'écriture de $|x|$ en base 2.
+
+:::
+
+Par exemple sur huit bits:
+
+```{r engine='tikz'}
+\usetikzlibrary{matrix}
+\begin{tikzpicture}
+
+\tikzstyle{signe}=[
+                        draw, 
+                        very thick, 
+                        fill=red!20!white
+                    ]
+
+\tikzstyle{exposant}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white
+                    ]
+
+\matrix [column sep=0cm, row sep = 0.1cm]
+{
+    \node (a-7) [signe] {1};
+  & \node (a-6) [exposant] {1};
+  & \node (a-5) [exposant] {0};
+  & \node (a-4) [exposant] {0};
+  & \node (a-3) [exposant] {1};
+  & \node (a-2) [exposant] {1};
+  & \node (a-1) [exposant] {0};
+  & \node (a-0) [exposant] {0};
+\\
+};
+
+\foreach \i in {0,1,...,6}{
+    \node[below] at ([shift=({0cm,-0.01cm})]a-\i.south) {\tiny{$2^\i$}};
+}
+
+\node[below, red] at ([shift=({0cm,-0.06cm})]a-7.south) {\tiny{signe}};
+\node[right] at ([shift=({0.01cm,0cm})]a-0.east) {$=-76$};
+
+\end{tikzpicture}
+```
+
+## Les entiers signés
+
+- En pratique, les nombres négatifs sont représentés un peu différemment, à l'aide du complément à deux.
+- Nous voulons calculer l'inverse de la racine carrée d'un nombre.
+- Nous supposons que le nombre est positif.
+- Le bit à gauche est toujours `0`.
+
+. . .
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzstyle{signe}=[
+                        draw, 
+                        very thick, 
+                        fill=red!20!white,
+                        minimum height = 0.55cm
+                    ]
+
+\tikzstyle{exposant}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white,
+                        minimum height = 0.55cm
+                    ]
+
+\matrix [column sep=0cm, row sep = 0.1cm]
+{
+    \node (a-1) [signe] {0};
+  & \node (a-0) [exposant] {$n-1$ bits};
+\\
+};
+
+\end{tikzpicture}
+```
+
+## Le format `entier long`
+
+- 32 bits au total
+- 1 bit pour le signe
+- 31 bits pour la mantisse
+- Le maximum représentable est $2^{31}-1=2\ 147\ 483\ 647$
+
+. . .
+
+```{r engine="tikz"}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [mantisse] {}; 
+& \node (f-29) [mantisse] {}; 
+& \node (f-28) [mantisse] {}; 
+& \node (f-27) [mantisse] {}; 
+& \node (f-26) [mantisse] {}; 
+& \node (f-25) [mantisse] {}; 
+& \node (f-24) [mantisse] {}; 
+& \node (f-23) [mantisse] {}; 
+
+& \node (f-22) [mantisse] {}; 
+& \node (f-21) [mantisse] {}; 
+& \node (f-20) [mantisse] {}; 
+& \node (f-19) [mantisse] {}; 
+& \node (f-18) [mantisse] {}; 
+& \node (f-17) [mantisse] {}; 
+& \node (f-16) [mantisse] {}; 
+& \node (f-15) [mantisse] {};
+& \node (f-14) [mantisse] {};
+& \node (f-13) [mantisse] {};
+& \node (f-12) [mantisse] {};
+& \node (f-11) [mantisse] {};
+& \node (f-10) [mantisse] {};
+& \node (f-9) [mantisse] {};
+& \node (f-8) [mantisse] {};
+& \node (f-7) [mantisse] {};
+& \node (f-6) [mantisse] {};
+& \node (f-5) [mantisse] {};
+& \node (f-4) [mantisse] {};
+& \node (f-3) [mantisse] {};
+& \node (f-2) [mantisse] {};
+& \node (f-1) [mantisse] {};
+& \node (f-0) [mantisse] {};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-31.south) circle (1pt) node[below] {31};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-30.south) circle (1pt) node[below] {30};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-0.south) circle (1pt) node[below] {0};
+
+\draw[blue] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (31 bits)} --++(0,-0.25);
+
+\end{tikzpicture}
+```
+
+## Un exemple "célèbre"
+
+- On représente l'entier 1 346 269 en utilisant un `entier long`.
+
+. . .
+
+```{r engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [mantisse] {\Large 0}; 
+& \node (f-29) [mantisse] {\Large 0}; 
+& \node (f-28) [mantisse] {\Large 0}; 
+& \node (f-27) [mantisse] {\Large 0}; 
+& \node (f-26) [mantisse] {\Large 0}; 
+& \node (f-25) [mantisse] {\Large 0}; 
+& \node (f-24) [mantisse] {\Large 0}; 
+& \node (f-23) [mantisse] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 1}; 
+& \node (f-19) [mantisse] {\Large 0}; 
+& \node (f-18) [mantisse] {\Large 1}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 0}; 
+& \node (f-15) [mantisse] {\Large 1};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 0};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 0};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 1};
+& \node (f-1) [mantisse] {\Large 0};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+
+\draw[blue] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (23 bits)} --++(0,-0.25);
+
+%\draw[green] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-23.north) node[midway, above] {exposant (8 bits)} --++(0,-0.25);
+
+\foreach \i in {0,30,31}{
+	\draw[fill=black] ([shift=({0,-0.1cm})]f-\i.south) circle (1pt) node[below] {\i};
+}
+
+
+\end{tikzpicture}
+```
+
+. . .
+
+En `Python`.
+
+```{python}
+#| echo: true
+
+0b000000000101001000101011011101
+0x148add
+```
+
+. . .
+
+C'est le 31ème nombre de la suite de Fibonacci.
+
+# Virgule flottante {background-color="black"}
+
+## Représentation normalisée
+
+- En décimal, nous avons:
+
+. . .
+
+$$
++13,254 = \underbrace{+}_{\text{signe}} 0,\underbrace{13254}_{\text{mantisse}} \times 10^{\overbrace{{2}}^{\text{exposant}}}
+$$
+
+## Représentation normalisée
+
+::: {.nonincremental}
+- Par contre, en binaire, nous avons:
+:::
+
+. . .
+
+$$
++10,101 = \underbrace{+}_{\text{signe}} \overbrace{1}^{\text{toujours}\ 1},\underbrace{0101}_{\text{mantisse}} \times 2^{\overbrace{{1}}^{\text{exposant}}}
+$$
+
+- Le premier 1 est implicite et n'a pas besoin d'être stocké. 
+
+## La norme IEEE 754
+
+```{r engine='tikz'}
+
+\usetikzlibrary{decorations.pathreplacing}
+\begin{tikzpicture}
+
+\tikzstyle{signe}=[
+                        draw, 
+                        very thick, 
+                        fill=red!20!white
+                    ]
+
+\tikzstyle{exposant}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white,
+                        text width = 2cm, 
+                        align = center
+                    ]
+
+\tikzstyle{mantisse}=[
+                        draw, 
+                        very thick, 
+                        fill=blue!20!white,
+                        text width = 2cm, 
+                        align = center
+                    ]   
+
+\matrix [column sep=0cm]
+{
+\node (s) [signe] {S}; 
+& \node (e) [exposant] {E}; 
+& \node (m) [mantisse] {M}; \\
+};
+
+
+
+\draw [decoration={brace,mirror}, decorate] ([shift=({0cm,-0.1cm})]e.south west) -- node [midway, below, text width = 1cm, align = center] {exposant $e$ bits} ([shift=({0cm,-0.1cm})]e.south east);
+
+\draw [decoration={brace}, decorate] ([shift=({0cm,0.1cm})]m.north west) -- node [midway, above, text width = 1cm, align = center] {mantisse $m$ bits} ([shift=({0cm,0.1cm})]m.north east);
+
+\draw [decoration={brace}, decorate] ([shift=({0cm,0.1cm})]s.north west) -- node [midway, above, text width = 1cm, align = center] {bit de signe} ([shift=({0cm,0.1cm})]s.north east);
+
+\end{tikzpicture}
+```
+
+## La norme IEEE 754
+
+- 1 bit pour le signe $S_x$
+- $e$ bits pour l'exposant $E_x$ biaisé (pour trouver l'exposant réel, il faut soustraire une valeur (le biais) à celle stockée.)
+- $m$ bits pour la mantisse $M_x$ (un entier entre 0 et $2^m-1$)
+
+. . .
+
+Un nombre flottant normalisé a une valeur $N_x$ donnée par la formule suivante:
+$$
+N_x = (-1)^{S_x} \times 2^{E_x-\text{BIAIS}} \times \left(1+\frac{M_x}{2^m}\right)
+$$
+
+## Le format `simple précision`
+
+- 32 bits au total
+- 1 bit pour le signe $S_x$
+- 8 bits pour l'exposant $E_x$ biaisé (biais de 127)
+- 23 bits pour la mantisse $M_x$ (de $0$ à $2^{23}-1$)
+
+. . .
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzstyle{signe}=[
+                        draw, 
+                        very thick, 
+                        fill=red!20!white,
+                        minimum height = 0.55cm
+                    ]
+
+\tikzstyle{exposant}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white,
+                        text width = 2cm, 
+                        align = center,
+                        minimum height = 0.55cm
+                    ]
+
+\tikzstyle{mantisse}=[
+                        draw, 
+                        very thick, 
+                        fill=blue!20!white,
+                        text width = 2cm, 
+                        align = center,
+                        minimum height = 0.55cm
+                    ]   
+
+\matrix [column sep=0cm]
+{
+\node (s) [signe] {1 bit}; 
+& \node (e) [exposant] {8 bits}; 
+& \node (m) [mantisse] {23 bits}; \\
+};
+
+\end{tikzpicture}
+```
+
+## Le format `simple précision`
+
+::: {.nonincremental}
+- 32 bits au total
+- 1 bit pour le signe $S_x$
+- 8 bits pour l'exposant $E_x$ biaisé (biais de 127)
+- 23 bits pour la mantisse $M_x$ (de $0$ à $2^{23}-1$)
+:::
+
+$$
+N_x = (-1)^{S_x} \times 2^{E_x-127} \times \left(1+\frac{M_x}{2^{23}}\right)
+$$
+
+## Un exemple "célèbre"
+
+- On représente $\pi$ en utilisant le format `simple précision`.
+
+. . .
+
+```{r, engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 0}; 
+& \node (f-27) [exposant] {\Large 0}; 
+& \node (f-26) [exposant] {\Large 0}; 
+& \node (f-25) [exposant] {\Large 0}; 
+& \node (f-24) [exposant] {\Large 0}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 0}; 
+& \node (f-19) [mantisse] {\Large 1}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 1}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+
+\draw[green] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-23.north) node[midway, above] {exposant (8 bits)} --++(0,-0.25);
+
+\draw[blue] ([shift=({0,0.1cm})]f-22.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (23 bits)} --++(0,-0.25);
+
+\foreach \i in {0,22,23,30,31}{
+	\draw[fill=black] ([shift=({0,-0.1cm})]f-\i.south) circle (1pt) node[below] {\i};
+}
+
+\end{tikzpicture}
+```
+
+. . .
+
+La représentation précédente donne $\pi \approx 3,1415927$.
+
+# Trains de bits {background-color="black"}
+
+## Trains de bits
+
+- Un `entier long` sur 32 bits.
+
+. . .
+
+```{r engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [mantisse] {}; 
+& \node (f-29) [mantisse] {}; 
+& \node (f-28) [mantisse] {}; 
+& \node (f-27) [mantisse] {}; 
+& \node (f-26) [mantisse] {}; 
+& \node (f-25) [mantisse] {}; 
+& \node (f-24) [mantisse] {}; 
+& \node (f-23) [mantisse] {}; 
+
+& \node (f-22) [mantisse] {}; 
+& \node (f-21) [mantisse] {}; 
+& \node (f-20) [mantisse] {}; 
+& \node (f-19) [mantisse] {}; 
+& \node (f-18) [mantisse] {}; 
+& \node (f-17) [mantisse] {}; 
+& \node (f-16) [mantisse] {}; 
+& \node (f-15) [mantisse] {};
+& \node (f-14) [mantisse] {};
+& \node (f-13) [mantisse] {};
+& \node (f-12) [mantisse] {};
+& \node (f-11) [mantisse] {};
+& \node (f-10) [mantisse] {};
+& \node (f-9) [mantisse] {};
+& \node (f-8) [mantisse] {};
+& \node (f-7) [mantisse] {};
+& \node (f-6) [mantisse] {};
+& \node (f-5) [mantisse] {};
+& \node (f-4) [mantisse] {};
+& \node (f-3) [mantisse] {};
+& \node (f-2) [mantisse] {};
+& \node (f-1) [mantisse] {};
+& \node (f-0) [mantisse] {};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-31.south) circle (1pt) node[below] {31};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-30.south) circle (1pt) node[below] {30};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-23.south) circle (1pt) node[below] {23};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-22.south) circle (1pt) node[below] {22};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-0.south) circle (1pt) node[below] {0};
+
+\draw[blue] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (31 bits)} --++(0,-0.25);
+
+\end{tikzpicture}
+```
+
+- Un flottant `simple précision` sur 32 bits.
+
+. . .
+
+```{r engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {}; 
+& \node (f-29) [exposant] {}; 
+& \node (f-28) [exposant] {}; 
+& \node (f-27) [exposant] {}; 
+& \node (f-26) [exposant] {}; 
+& \node (f-25) [exposant] {}; 
+& \node (f-24) [exposant] {}; 
+& \node (f-23) [exposant] {}; 
+
+& \node (f-22) [mantisse] {}; 
+& \node (f-21) [mantisse] {}; 
+& \node (f-20) [mantisse] {}; 
+& \node (f-19) [mantisse] {}; 
+& \node (f-18) [mantisse] {}; 
+& \node (f-17) [mantisse] {}; 
+& \node (f-16) [mantisse] {}; 
+& \node (f-15) [mantisse] {};
+& \node (f-14) [mantisse] {};
+& \node (f-13) [mantisse] {};
+& \node (f-12) [mantisse] {};
+& \node (f-11) [mantisse] {};
+& \node (f-10) [mantisse] {};
+& \node (f-9) [mantisse] {};
+& \node (f-8) [mantisse] {};
+& \node (f-7) [mantisse] {};
+& \node (f-6) [mantisse] {};
+& \node (f-5) [mantisse] {};
+& \node (f-4) [mantisse] {};
+& \node (f-3) [mantisse] {};
+& \node (f-2) [mantisse] {};
+& \node (f-1) [mantisse] {};
+& \node (f-0) [mantisse] {};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-31.south) circle (1pt) node[below] {31};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-30.south) circle (1pt) node[below] {30};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-23.south) circle (1pt) node[below] {23};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-22.south) circle (1pt) node[below] {22};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-0.south) circle (1pt) node[below] {0};
+
+\draw[green] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-23.north) node[midway, above] {exposant (8 bits)} --++(0,-0.25);
+
+\draw[blue] ([shift=({0,0.1cm})]f-22.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (23 bits)} --++(0,-0.25);
+
+\end{tikzpicture}
+```
+
+## Trains de bits
+
+```{r, engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [mantisse] {\Large 0}; 
+& \node (f-29) [mantisse] {\Large 1}; 
+& \node (f-28) [mantisse] {\Large 0}; 
+& \node (f-27) [mantisse] {\Large 0}; 
+& \node (f-26) [mantisse] {\Large 0}; 
+& \node (f-25) [mantisse] {\Large 0}; 
+& \node (f-24) [mantisse] {\Large 0}; 
+& \node (f-23) [mantisse] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 0}; 
+& \node (f-19) [mantisse] {\Large 1}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 1}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+
+\draw[blue] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (23 bits)} --++(0,-0.25);
+
+\foreach \i in {0,22,23,30,31}{
+	\draw[fill=black] ([shift=({0,-0.1cm})]f-\i.south) circle (1pt) node[below] {\i};
+}
+
+\end{tikzpicture}
+```
+
+- Représente l'entier 1078530011.
+- Représenté par `0x40490fdb`.
+
+. . .
+
+```{r, engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 0}; 
+& \node (f-27) [exposant] {\Large 0}; 
+& \node (f-26) [exposant] {\Large 0}; 
+& \node (f-25) [exposant] {\Large 0}; 
+& \node (f-24) [exposant] {\Large 0}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 0}; 
+& \node (f-19) [mantisse] {\Large 1}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 1}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+
+\draw[green] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-23.north) node[midway, above] {exposant (8 bits)} --++(0,-0.25);
+
+\draw[blue] ([shift=({0,0.1cm})]f-22.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (23 bits)} --++(0,-0.25);
+
+\foreach \i in {0,22,23,30,31}{
+	\draw[fill=black] ([shift=({0,-0.1cm})]f-\i.south) circle (1pt) node[below] {\i};
+}
+
+\end{tikzpicture}
+```
+
+- Représente le nombre décimal 3,1415927.
+- Aussi représenté par `0x40490fdb`.
+
+## Trains de bits
+
+```{r engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {}; 
+& \node (f-29) [exposant] {}; 
+& \node (f-28) [exposant] {}; 
+& \node (f-27) [exposant] {}; 
+& \node (f-26) [exposant] {}; 
+& \node (f-25) [exposant] {}; 
+& \node (f-24) [exposant] {}; 
+& \node (f-23) [exposant] {}; 
+
+& \node (f-22) [mantisse] {}; 
+& \node (f-21) [mantisse] {}; 
+& \node (f-20) [mantisse] {}; 
+& \node (f-19) [mantisse] {}; 
+& \node (f-18) [mantisse] {}; 
+& \node (f-17) [mantisse] {}; 
+& \node (f-16) [mantisse] {}; 
+& \node (f-15) [mantisse] {};
+& \node (f-14) [mantisse] {};
+& \node (f-13) [mantisse] {};
+& \node (f-12) [mantisse] {};
+& \node (f-11) [mantisse] {};
+& \node (f-10) [mantisse] {};
+& \node (f-9) [mantisse] {};
+& \node (f-8) [mantisse] {};
+& \node (f-7) [mantisse] {};
+& \node (f-6) [mantisse] {};
+& \node (f-5) [mantisse] {};
+& \node (f-4) [mantisse] {};
+& \node (f-3) [mantisse] {};
+& \node (f-2) [mantisse] {};
+& \node (f-1) [mantisse] {};
+& \node (f-0) [mantisse] {};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-31.south) circle (1pt) node[below] {31};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-30.south) circle (1pt) node[below] {30};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-23.south) circle (1pt) node[below] {23};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-22.south) circle (1pt) node[below] {22};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-0.south) circle (1pt) node[below] {0};
+
+\draw[green] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-23.north) node[midway, above] {exposant (8 bits)} --++(0,-0.25);
+
+\draw[blue] ([shift=({0,0.1cm})]f-22.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (23 bits)} --++(0,-0.25);
+
+\end{tikzpicture}
+```
+
+```{r engine="tikz"}
+\begin{tikzpicture}
+
+\tikzset{
+	box/.style = {
+	minimum height=1cm,
+	minimum width = 0.6cm
+	}
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [mantisse] {}; 
+& \node (f-29) [mantisse] {}; 
+& \node (f-28) [mantisse] {}; 
+& \node (f-27) [mantisse] {}; 
+& \node (f-26) [mantisse] {}; 
+& \node (f-25) [mantisse] {}; 
+& \node (f-24) [mantisse] {}; 
+& \node (f-23) [mantisse] {}; 
+
+& \node (f-22) [mantisse] {}; 
+& \node (f-21) [mantisse] {}; 
+& \node (f-20) [mantisse] {}; 
+& \node (f-19) [mantisse] {}; 
+& \node (f-18) [mantisse] {}; 
+& \node (f-17) [mantisse] {}; 
+& \node (f-16) [mantisse] {}; 
+& \node (f-15) [mantisse] {};
+& \node (f-14) [mantisse] {};
+& \node (f-13) [mantisse] {};
+& \node (f-12) [mantisse] {};
+& \node (f-11) [mantisse] {};
+& \node (f-10) [mantisse] {};
+& \node (f-9) [mantisse] {};
+& \node (f-8) [mantisse] {};
+& \node (f-7) [mantisse] {};
+& \node (f-6) [mantisse] {};
+& \node (f-5) [mantisse] {};
+& \node (f-4) [mantisse] {};
+& \node (f-3) [mantisse] {};
+& \node (f-2) [mantisse] {};
+& \node (f-1) [mantisse] {};
+& \node (f-0) [mantisse] {};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-31.south) circle (1pt) node[below] {31};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-30.south) circle (1pt) node[below] {30};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-23.south) circle (1pt) node[below] {23};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-22.south) circle (1pt) node[below] {22};
+\draw[fill=black] ([shift=({0,-0.1cm})]f-0.south) circle (1pt) node[below] {0};
+
+\draw[blue] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (31 bits)} --++(0,-0.25);
+
+\end{tikzpicture}
+```
+
+- Posons $L=2^{23}$.
+- Lorsqu'on interprète le nombre en virgule flottante comme un entier, nous avons $R_x = E_x \cdot L + M_x$.
+
+## `Entier long` $\leftrightarrow$ `Simple précision`
+
+- Les lignes suivantes du code *interprètent* un nombre à virgule flottante en entier et ensuite le *réinterprète* comme un nombre à virgule flottante.
+
+. . .
+
+```{.python code-line-numbers="6,7,9"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+# Opérations bit à bit {background-color="black"}
+
+## Décalages de bit
+
+- En logique, une opération bit à bit est un calcul manipulant les données directement au niveau des bits, selon une arithmétique booléenne.
+- Les opérations qui nous intéressent particulièrement sont les décalages de bits.
+
+## Décalage à gauche (`<<`)
+
+. . .
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzstyle{depart}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white
+                    ]
+\tikzstyle{arrivee}=[
+                        draw, 
+                        very thick, 
+                        fill=red!20!white
+                    ]
+\tikzstyle{add}=[
+                        draw, 
+                        very thick, 
+                        fill=blue!20!white
+                    ]
+
+\matrix [column sep=0cm, row sep = 1cm]
+{
+    \node (a-7) [depart] {0};
+  & \node (a-6) [depart] {0};
+  & \node (a-5) [depart] {0};
+  & \node (a-4) [depart] {1};
+  & \node (a-3) [depart] {0};
+  & \node (a-2) [depart] {1};
+  & \node (a-1) [depart] {1};
+  & \node (a-0) [depart] {1};
+\\
+
+    \node (b-7) [arrivee] {0};
+  & \node (b-6) [arrivee] {0};
+  & \node (b-5) [arrivee] {1};
+  & \node (b-4) [arrivee] {0};
+  & \node (b-3) [arrivee] {1};
+  & \node (b-2) [arrivee] {1};
+  & \node (b-1) [arrivee] {1};
+  & \node (b-0) [arrivee] {0};
+  \\
+};
+
+\node[add] (add) at ([shift=({0.75cm,0cm})]b-0.east) {0};
+\draw[->,thick] (add.west) -- (b-0.east);
+\foreach \i in {0,1,...,7}{
+    \node[above] at ([shift=({0cm,0.01cm})]a-\i.north) {\i};
+}
+
+\foreach \i/\j in {0/1,1/2,2/3,3/4,4/5,5/6,6/7}{
+    \draw[->,thick] (a-\i.south) -- (b-\j.north);
+}
+
+\end{tikzpicture}
+```
+
+- En base décimale un décalage à gauche représente une multiplication par 10.
+- En base binaire, un décalage à gauche correspond à une multiplication par 2.
+
+## Décalage à droite (`>>`)
+
+. . .
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzstyle{depart}=[
+                        draw, 
+                        very thick, 
+                        fill=green!20!white
+                    ]
+\tikzstyle{arrivee}=[
+                        draw, 
+                        very thick, 
+                        fill=red!20!white
+                    ]
+\tikzstyle{add}=[
+                        draw, 
+                        very thick, 
+                        fill=blue!20!white
+                    ]
+
+\matrix [column sep=0cm, row sep = 1cm]
+{
+    \node (a-7) [depart] {0};
+  & \node (a-6) [depart] {0};
+  & \node (a-5) [depart] {0};
+  & \node (a-4) [depart] {1};
+  & \node (a-3) [depart] {0};
+  & \node (a-2) [depart] {1};
+  & \node (a-1) [depart] {1};
+  & \node (a-0) [depart] {1};
+\\
+
+    \node (b-7) [arrivee] {0};
+  & \node (b-6) [arrivee] {0};
+  & \node (b-5) [arrivee] {0};
+  & \node (b-4) [arrivee] {0};
+  & \node (b-3) [arrivee] {1};
+  & \node (b-2) [arrivee] {0};
+  & \node (b-1) [arrivee] {1};
+  & \node (b-0) [arrivee] {1};
+  \\
+};
+
+\node[add] (add) at ([shift=({-0.75cm,0cm})]b-7.west) {0};
+\draw[->,thick] (add.east) -- (b-7.west);
+\foreach \i in {0,1,...,7}{
+    \node[above] at ([shift=({0cm,0.01cm})]a-\i.north) {\i};
+}
+
+\foreach \i/\j in {7/6,6/5,5/4,4/3,3/2,2/1,1/0}{
+    \draw[->,thick] (a-\i.south) -- (b-\j.north);
+}
+
+\end{tikzpicture}
+```
+
+- En base décimale un décalage à droite représente une division par 10 (on arrondit à l'entier inférieur).
+- En base binaire, un décalage à droite correspond à une division par 2 (on arrondit à l'entier inférieur).
+
+## Décalage à droite (`>>`)
+
+- On utilise le décalage à droite dans le code à la ligne suivante:
+
+. . .
+
+```{.python code-line-numbers="false"}
+i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+```
+
+- En `Python`:
+
+. . .
+
+```{python}
+#| echo: true
+#| code-line-numbers: false
+
+0b100001
+0b100001 >> 1
+```
+
+# La méthode de Newton {background-color="black"}
+
+## La méthode de Newton
+
+- La méthode de Newton est un algorithme pour trouver numériquement une approximation précise d'un zéro d'une fonction $f(x)$.
+- Si $f(x)=0$ pour un certain $x$, alors si on choisit $x_0$ suffisament proche de $x$, la suite ci-dessous converge vers la valeur de $x$:
+
+. . .
+
+$$
+x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
+$$
+
+## La méthode de Newton pour $\frac{1}{\sqrt{x}}$
+
+- Considérons la fonction $f(y)=\frac{1}{y^2}-x$, qui possède comme racine $y=\frac{1}{\sqrt{x}}$.
+- En appliquant la méthode de Newton, nous obtenons la suite:
+
+. . .
+
+$$
+y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \right)
+$$
+
+. . .
+
+qui est exactement la ligne
+
+``` {.python code-line-numbers="false"}
+y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+```
+
+# `Q_rsqrt` {background-color="black"}
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="|3"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+- On assigne la valeur $\frac{3}{2}$ à la variable `threehalfs`.
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="5"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+::: {.nonincremental}
+- On multiplie le nombre dont on veut trouver l'inverse de la racine carrée par $0,5$.
+:::
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="6"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+::: {.nonincremental}
+- On mémorise le nombre dans la variable `y` qui est représentée en mode `simple précision`.
+:::
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="7"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+::: {.nonincremental}
+- On *interprète* la valeur mémorisée de $y$ comme un `entier long`, plutôt que comme un nombre à virgule flottante `simple précision`.
+:::
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="8"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+::: {.nonincremental}
+- On effectue une soustraction et un décalage à droite (qui divise la variable $i$ par deux).
+:::
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="9"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+::: {.nonincremental}
+- On *réinterprète* la valeur mémorisée de $i$ comme un nombre à virgule flottante `simple précision`, plutôt que comme un `entier long`.
+:::
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="10"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+::: {.nonincremental}
+- On effectue une itération de la méthode de Newton.
+:::
+
+## `Q_rsqrt`
+
+```{.python code-line-numbers="11"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+::: {.nonincremental}
+- La deuxième itération de la méthode de Newton n'est pas nécessaire!
+:::
+
+# C'est quoi le truc? {background-color="black"}
+
+## *evil floating point bit level hacking*
+
+. . .
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+
+x = np.linspace(1, 100, 1000)
+x = np.float32(x)
+y = x.view(np.int32)
+
+ax.plot(x, y)
+plt.xlabel("Nombre à virgule flottante")
+plt.ylabel("Représentation comme un entier")
+plt.show()
+```
+
+## *evil floating point bit level hacking*
+
+> Interpréter un nombre à virgule flottante positif $x$ comme un entier donne une approximation de son logarithme en base $2$.
+
+. . .
+
+$$
+N_x = 2^{E_x-B} \cdot \left(1+\frac{M_x}{L}\right)
+$$
+où $B=127$ et $L=2^{23}$.
+
+## *evil floating point bit level hacking*
+
+. . .
+
+\begin{aligned}
+N_x &= 2^{E_x-B} \cdot \left(1+\frac{M_x}{L}\right) \\
+\log_2 (N_x) &= E_x-B + \log_2 \left(1+\frac{M_x}{L}\right)
+\end{aligned}
+
+. . .
+
+Puisque $0\leq\frac{M_x}{L}<1$ alors:
+
+. . .
+
+$$
+\log_2 \left(1+\frac{M_x}{L}\right) \approx \frac{M_x}{L} + \sigma
+$$
+
+## *evil floating point bit level hacking*
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+fig, ax = plt.subplots()
+
+ln2 = math.log(2)
+lnln2 = math.log(ln2)
+sigma1 = (0.5 - (1+lnln2)/(2*ln2))
+L = 2**23
+B = 127
+magic = 0x5F3759DF
+sigma2 = B - 2 * magic / (3 * L)
+
+x = np.linspace(0, 1, 1000)
+y1 = np.log2(1+x)
+y2 = x + sigma1
+y3 = x + sigma2
+
+ax.plot(x, y1, color = "blue", label = "log_2(1+x)")
+ax.plot(x, x, color = "red", label = "x")
+#ax.plot(x, y2, color = "yellow", label = "x+0,04303566602796716")
+#ax.plot(x, y3, color = "green", label = "x+0,04504656791687012")
+plt.xlabel("x")
+plt.legend()
+plt.show()
+```
+
+## *evil floating point bit level hacking*
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+fig, ax = plt.subplots()
+
+ln2 = math.log(2)
+lnln2 = math.log(ln2)
+sigma1 = (0.5 - (1+lnln2)/(2*ln2))
+L = 2**23
+B = 127
+magic = 0x5F3759DF
+sigma2 = B - 2 * magic / (3 * L)
+
+x = np.linspace(0, 1, 1000)
+y1 = np.log2(1+x)
+y2 = x + sigma1
+y3 = x + sigma2
+
+ax.plot(x, y1, color = "blue", label = "log_2(1+x)")
+ax.plot(x, x, color = "red", label = "x")
+ax.plot(x, y2, color = "yellow", label = "x+0,04303566602796716")
+#ax.plot(x, y3, color = "green", label = "x+0,04504656791687012")
+plt.xlabel("x")
+plt.legend()
+plt.show()
+```
+
+## *evil floating point bit level hacking*
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+fig, ax = plt.subplots()
+
+ln2 = math.log(2)
+lnln2 = math.log(ln2)
+sigma1 = (0.5 - (1+lnln2)/(2*ln2))
+L = 2**23
+B = 127
+magic = 0x5F3759DF
+sigma2 = B - 2 * magic / (3 * L)
+
+x = np.linspace(0, 1, 1000)
+y1 = np.log2(1+x)
+y2 = x + sigma1
+y3 = x + sigma2
+
+ax.plot(x, y1, color = "blue", label = "log_2(1+x)")
+ax.plot(x, x, color = "red", label = "x")
+ax.plot(x, y2, color = "yellow", label = "x+0,04303566602796716")
+ax.plot(x, y3, color = "green", label = "x+0,04504656791687012")
+plt.xlabel("x")
+plt.legend()
+plt.show()
+```
+
+## *evil floating point bit level hacking*
+
+$$
+\log_2 (N_x) \approx E_x-B + \frac{M_x}{L} + \sigma \\
+$$
+Lorsqu'on interprète un nombre en virgule flottante comme un entier, nous avons: $R_x=E_x \cdot L + M_x$.
+
+. . .
+
+$$
+R_x \approx L\log_2(N_x) + L(B-\sigma)
+$$
+
+$$
+\log_2(N_x) = \frac{R_x}{L} - (B-\sigma)
+$$
+
+## *evil floating point bit level hacking*
+
+- Si $y=\frac{1}{\sqrt{x}}$ alors $\log_2(y) = -\frac{1}{2}\log_2(x)$.
+
+. . .
+
+\begin{aligned}
+\log_2(y) &= -\frac{1}{2}\log_2(x) \\
+\frac{R_y}{L} - (B-\sigma) &= -\frac{1}{2}\left(\frac{R_x}{L} - (B-\sigma) \right) \\
+R_y &= \frac{3}{2}L(B-\sigma) - \frac{1}{2}R_x
+\end{aligned}
+
+. . .
+
+```{.python code-line-numbers="false"}
+i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+```
+
+# Un exemple {background-color="black"}
+
+## Un exemple
+
+
+
+
+
+
+
+
+
+
+
 
 

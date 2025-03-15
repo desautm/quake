@@ -1,0 +1,25 @@
+---
+title: "Sites webs"
+format: html
+editor: visual
+---
+
+- [How much of a genius-level move was using binary space partitioning in *Doom*?](https://arstechnica.com/gaming/2019/12/how-much-of-a-genius-level-move-was-using-binary-space-partitioning-in-doom/)
+
+- [**Fast Inverse Square Root --- A Quake III Algorithm**](https://www.youtube.com/watch?v=p8u_k2LIZyo)
+
+- [Approximate distance](https://doomwiki.org/wiki/Approximate_distance)
+
+- [Fast Inverse Square Root](https://en.algorithmica.org/hpc/arithmetic/rsqrt/)
+
+- [Magic Constant](https://blog.timhutt.co.uk/fast-inverse-square-root/)
+
+- [The Fast Inverse Square Root method in Python](https://ajcr.net/fast-inverse-square-root-python/)
+
+- [Wikipédia](https://en.wikipedia.org/wiki/Fast_inverse_square_root#Overview_of_the_code)
+
+- [1597463007](https://mrob.com/pub/math/numbers-16.html#le009_16)
+
+- [Eberly](https://0x5f37642f.com/documents/EberlyFISR.pdf)
+
+
