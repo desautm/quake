@@ -402,22 +402,6 @@ Marc-André Désautels
 </div>
 
 </section>
-<section class="slide level2">
-
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>python:         C:/Users/mdesautels/AppData/Local/Programs/Python/Python312/python.exe
-libpython:      C:/Users/mdesautels/AppData/Local/Programs/Python/Python312/python312.dll
-pythonhome:     C:/Users/mdesautels/AppData/Local/Programs/Python/Python312
-version:        3.12.3 (tags/v3.12.3:f6650f9, Apr  9 2024, 14:05:25) [MSC v.1938 64 bit (AMD64)]
-Architecture:   64bit
-numpy:          C:/Users/mdesautels/AppData/Roaming/Python/Python312/site-packages/numpy
-numpy_version:  1.26.4
-
-NOTE: Python version was forced by use_python() function</code></pre>
-</div>
-</div>
-</section>
 <section id="section" class="title-slide slide level1 center" data-background-image="https://upload.wikimedia.org/wikipedia/en/a/a1/Quake3Title.jpg" data-background-color="black" data-background-size="contain">
 <h1></h1>
 
@@ -456,22 +440,22 @@ NOTE: Python version was forced by use_python() function</code></pre>
 <p>L’inverse de la racine carrée, <span class="math inline">\(\frac{1}{\sqrt{x}}\)</span>.</p>
 </div>
 <div class="fragment">
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource c number-lines code-with-copy"><code class="sourceCode c"><span id="cb2-1"><a href=""></a><span class="dt">float</span> Q_rsqrt<span class="op">(</span> <span class="dt">float</span> number <span class="op">)</span></span>
-<span id="cb2-2"><a href=""></a><span class="op">{</span></span>
-<span id="cb2-3"><a href=""></a>    <span class="dt">long</span> i<span class="op">;</span></span>
-<span id="cb2-4"><a href=""></a>    <span class="dt">float</span> x2<span class="op">,</span> y<span class="op">;</span></span>
-<span id="cb2-5"><a href=""></a>    <span class="dt">const</span> <span class="dt">float</span> threehalfs <span class="op">=</span> <span class="fl">1.5</span><span class="bu">F</span><span class="op">;</span></span>
-<span id="cb2-6"><a href=""></a></span>
-<span id="cb2-7"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span><span class="bu">F</span><span class="op">;</span></span>
-<span id="cb2-8"><a href=""></a>    y <span class="op">=</span> number<span class="op">;</span></span>
-<span id="cb2-9"><a href=""></a>    i <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">long</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>y<span class="op">;</span> <span class="co">// evil floating point bit level hacking</span></span>
-<span id="cb2-10"><a href=""></a>    i <span class="op">=</span> <span class="bn">0x5f3759df</span> <span class="op">-</span> <span class="op">(</span> i <span class="op">&gt;&gt;</span> <span class="dv">1</span> <span class="op">);</span> <span class="co">// what the fuck?</span></span>
-<span id="cb2-11"><a href=""></a>    y <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">float</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>i<span class="op">;</span></span>
-<span id="cb2-12"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> <span class="op">(</span> threehalfs <span class="op">-</span> <span class="op">(</span> x2 <span class="op">*</span> y <span class="op">*</span> y <span class="op">)</span> <span class="op">);</span> <span class="co">// 1st iteration</span></span>
-<span id="cb2-13"><a href=""></a><span class="co">//  y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed</span></span>
-<span id="cb2-14"><a href=""></a></span>
-<span id="cb2-15"><a href=""></a>    <span class="cf">return</span> y<span class="op">;</span></span>
-<span id="cb2-16"><a href=""></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource c number-lines code-with-copy"><code class="sourceCode c"><span id="cb1-1"><a href=""></a><span class="dt">float</span> Q_rsqrt<span class="op">(</span> <span class="dt">float</span> number <span class="op">)</span></span>
+<span id="cb1-2"><a href=""></a><span class="op">{</span></span>
+<span id="cb1-3"><a href=""></a>    <span class="dt">long</span> i<span class="op">;</span></span>
+<span id="cb1-4"><a href=""></a>    <span class="dt">float</span> x2<span class="op">,</span> y<span class="op">;</span></span>
+<span id="cb1-5"><a href=""></a>    <span class="dt">const</span> <span class="dt">float</span> threehalfs <span class="op">=</span> <span class="fl">1.5</span><span class="bu">F</span><span class="op">;</span></span>
+<span id="cb1-6"><a href=""></a></span>
+<span id="cb1-7"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span><span class="bu">F</span><span class="op">;</span></span>
+<span id="cb1-8"><a href=""></a>    y <span class="op">=</span> number<span class="op">;</span></span>
+<span id="cb1-9"><a href=""></a>    i <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">long</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>y<span class="op">;</span> <span class="co">// evil floating point bit level hacking</span></span>
+<span id="cb1-10"><a href=""></a>    i <span class="op">=</span> <span class="bn">0x5f3759df</span> <span class="op">-</span> <span class="op">(</span> i <span class="op">&gt;&gt;</span> <span class="dv">1</span> <span class="op">);</span> <span class="co">// what the fuck?</span></span>
+<span id="cb1-11"><a href=""></a>    y <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">float</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>i<span class="op">;</span></span>
+<span id="cb1-12"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> <span class="op">(</span> threehalfs <span class="op">-</span> <span class="op">(</span> x2 <span class="op">*</span> y <span class="op">*</span> y <span class="op">)</span> <span class="op">);</span> <span class="co">// 1st iteration</span></span>
+<span id="cb1-13"><a href=""></a><span class="co">//  y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed</span></span>
+<span id="cb1-14"><a href=""></a></span>
+<span id="cb1-15"><a href=""></a>    <span class="cf">return</span> y<span class="op">;</span></span>
+<span id="cb1-16"><a href=""></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="motivation" class="slide level2">
@@ -505,39 +489,39 @@ NOTE: Python version was forced by use_python() function</code></pre>
 </section>
 <section id="q_sqrt" class="slide level2">
 <h2><code>Q_sqrt</code></h2>
-<div class="sourceCode" id="cb3" data-code-line-numbers="|9-12"><pre class="sourceCode numberSource c number-lines code-with-copy"><code class="sourceCode c"><span id="cb3-1"><a href=""></a><span class="dt">float</span> Q_rsqrt<span class="op">(</span> <span class="dt">float</span> number <span class="op">)</span></span>
-<span id="cb3-2"><a href=""></a><span class="op">{</span></span>
-<span id="cb3-3"><a href=""></a>    <span class="dt">long</span> i<span class="op">;</span></span>
-<span id="cb3-4"><a href=""></a>    <span class="dt">float</span> x2<span class="op">,</span> y<span class="op">;</span></span>
-<span id="cb3-5"><a href=""></a>    <span class="dt">const</span> <span class="dt">float</span> threehalfs <span class="op">=</span> <span class="fl">1.5</span><span class="bu">F</span><span class="op">;</span></span>
-<span id="cb3-6"><a href=""></a></span>
-<span id="cb3-7"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span><span class="bu">F</span><span class="op">;</span></span>
-<span id="cb3-8"><a href=""></a>    y <span class="op">=</span> number<span class="op">;</span></span>
-<span id="cb3-9"><a href=""></a>    i <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">long</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>y<span class="op">;</span> <span class="co">// evil floating point bit level hacking</span></span>
-<span id="cb3-10"><a href=""></a>    i <span class="op">=</span> <span class="bn">0x5f3759df</span> <span class="op">-</span> <span class="op">(</span> i <span class="op">&gt;&gt;</span> <span class="dv">1</span> <span class="op">);</span> <span class="co">// what the fuck?</span></span>
-<span id="cb3-11"><a href=""></a>    y <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">float</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>i<span class="op">;</span></span>
-<span id="cb3-12"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> <span class="op">(</span> threehalfs <span class="op">-</span> <span class="op">(</span> x2 <span class="op">*</span> y <span class="op">*</span> y <span class="op">)</span> <span class="op">);</span> <span class="co">// 1st iteration</span></span>
-<span id="cb3-13"><a href=""></a><span class="co">//  y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed</span></span>
-<span id="cb3-14"><a href=""></a></span>
-<span id="cb3-15"><a href=""></a>    <span class="cf">return</span> y<span class="op">;</span></span>
-<span id="cb3-16"><a href=""></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2" data-code-line-numbers="|9-12"><pre class="sourceCode numberSource c number-lines code-with-copy"><code class="sourceCode c"><span id="cb2-1"><a href=""></a><span class="dt">float</span> Q_rsqrt<span class="op">(</span> <span class="dt">float</span> number <span class="op">)</span></span>
+<span id="cb2-2"><a href=""></a><span class="op">{</span></span>
+<span id="cb2-3"><a href=""></a>    <span class="dt">long</span> i<span class="op">;</span></span>
+<span id="cb2-4"><a href=""></a>    <span class="dt">float</span> x2<span class="op">,</span> y<span class="op">;</span></span>
+<span id="cb2-5"><a href=""></a>    <span class="dt">const</span> <span class="dt">float</span> threehalfs <span class="op">=</span> <span class="fl">1.5</span><span class="bu">F</span><span class="op">;</span></span>
+<span id="cb2-6"><a href=""></a></span>
+<span id="cb2-7"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span><span class="bu">F</span><span class="op">;</span></span>
+<span id="cb2-8"><a href=""></a>    y <span class="op">=</span> number<span class="op">;</span></span>
+<span id="cb2-9"><a href=""></a>    i <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">long</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>y<span class="op">;</span> <span class="co">// evil floating point bit level hacking</span></span>
+<span id="cb2-10"><a href=""></a>    i <span class="op">=</span> <span class="bn">0x5f3759df</span> <span class="op">-</span> <span class="op">(</span> i <span class="op">&gt;&gt;</span> <span class="dv">1</span> <span class="op">);</span> <span class="co">// what the fuck?</span></span>
+<span id="cb2-11"><a href=""></a>    y <span class="op">=</span> <span class="op">*</span> <span class="op">(</span> <span class="dt">float</span> <span class="op">*</span> <span class="op">)</span> <span class="op">&amp;</span>i<span class="op">;</span></span>
+<span id="cb2-12"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> <span class="op">(</span> threehalfs <span class="op">-</span> <span class="op">(</span> x2 <span class="op">*</span> y <span class="op">*</span> y <span class="op">)</span> <span class="op">);</span> <span class="co">// 1st iteration</span></span>
+<span id="cb2-13"><a href=""></a><span class="co">//  y = y * ( threehalfs - ( x2 * y * y ) ); // 2nd iteration, this can be removed</span></span>
+<span id="cb2-14"><a href=""></a></span>
+<span id="cb2-15"><a href=""></a>    <span class="cf">return</span> y<span class="op">;</span></span>
+<span id="cb2-16"><a href=""></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="python" class="slide level2">
 <h2><code>Python</code></h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
-<span id="cb4-2"><a href=""></a></span>
-<span id="cb4-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
-<span id="cb4-4"><a href=""></a>    </span>
-<span id="cb4-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
-<span id="cb4-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
-<span id="cb4-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
-<span id="cb4-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
-<span id="cb4-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
-<span id="cb4-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
-<span id="cb4-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
-<span id="cb4-12"><a href=""></a>    </span>
-<span id="cb4-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb3-2"><a href=""></a></span>
+<span id="cb3-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb3-4"><a href=""></a>    </span>
+<span id="cb3-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb3-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb3-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb3-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb3-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb3-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb3-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb3-12"><a href=""></a>    </span>
+<span id="cb3-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="est-ce-que-cette-approximation-est-bonne" class="slide level2">
@@ -601,9 +585,9 @@ NOTE: Python version was forced by use_python() function</code></pre>
 <div class="fragment">
 <p>Par exemple:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a>a <span class="op">=</span> <span class="dv">101001111</span></span>
-<span id="cb5-2"><a href=""></a>b <span class="op">=</span> <span class="bn">0b101001111</span></span>
-<span id="cb5-3"><a href=""></a><span class="bu">print</span>(a, b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href=""></a>a <span class="op">=</span> <span class="dv">101001111</span></span>
+<span id="cb4-2"><a href=""></a>b <span class="op">=</span> <span class="bn">0b101001111</span></span>
+<span id="cb4-3"><a href=""></a><span class="bu">print</span>(a, b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>101001111 335</code></pre>
 </div>
@@ -635,9 +619,9 @@ NOTE: Python version was forced by use_python() function</code></pre>
 <div class="fragment">
 <p>Par exemple:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a>a <span class="op">=</span> <span class="dv">335</span></span>
-<span id="cb7-2"><a href=""></a>b <span class="op">=</span> <span class="bn">0x14f</span></span>
-<span id="cb7-3"><a href=""></a><span class="bu">print</span>(a, b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href=""></a>a <span class="op">=</span> <span class="dv">335</span></span>
+<span id="cb6-2"><a href=""></a>b <span class="op">=</span> <span class="bn">0x14f</span></span>
+<span id="cb6-3"><a href=""></a><span class="bu">print</span>(a, b)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>335 335</code></pre>
 </div>
@@ -800,11 +784,11 @@ NOTE: Python version was forced by use_python() function</code></pre>
 <div class="fragment">
 <p>En <code>Python</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a><span class="bn">0b000000000101001000101011011101</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href=""></a><span class="bn">0b000000000101001000101011011101</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>1346269</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href=""></a><span class="bn">0x148add</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href=""></a><span class="bn">0x148add</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>1346269</code></pre>
 </div>
@@ -1042,19 +1026,19 @@ N_x = (-1)^{S_x} \times 2^{E_x-127} \times \left(1+\frac{M_x}{2^{23}}\right)
 <li class="fragment">Les lignes suivantes du code <em>interprètent</em> un nombre à virgule flottante en entier et ensuite le <em>réinterprète</em> comme un nombre à virgule flottante.</li>
 </ul>
 <div class="fragment">
-<div class="sourceCode" id="cb13" data-code-line-numbers="6,7,9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
-<span id="cb13-2"><a href=""></a></span>
-<span id="cb13-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
-<span id="cb13-4"><a href=""></a>    </span>
-<span id="cb13-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
-<span id="cb13-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
-<span id="cb13-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
-<span id="cb13-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
-<span id="cb13-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
-<span id="cb13-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
-<span id="cb13-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
-<span id="cb13-12"><a href=""></a>    </span>
-<span id="cb13-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12" data-code-line-numbers="6,7,9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb12-2"><a href=""></a></span>
+<span id="cb12-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb12-4"><a href=""></a>    </span>
+<span id="cb12-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb12-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb12-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb12-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb12-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb12-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb12-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb12-12"><a href=""></a>    </span>
+<span id="cb12-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section>
 <section>
@@ -1112,11 +1096,11 @@ N_x = (-1)^{S_x} \times 2^{E_x-127} \times \left(1+\frac{M_x}{2^{23}}\right)
 </ul>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b100001</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b100001</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>33</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b100001</span> <span class="op">&gt;&gt;</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b100001</span> <span class="op">&gt;&gt;</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>16</code></pre>
 </div>
@@ -1127,11 +1111,11 @@ N_x = (-1)^{S_x} \times 2^{E_x-127} \times \left(1+\frac{M_x}{2^{23}}\right)
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b10010110</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b10010110</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>150</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b10010110</span> <span class="op">&gt;&gt;</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="" aria-hidden="true" tabindex="-1"></a><span class="bn">0b10010110</span> <span class="op">&gt;&gt;</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>75</code></pre>
 </div>
@@ -1144,19 +1128,19 @@ N_x = (-1)^{S_x} \times 2^{E_x-127} \times \left(1+\frac{M_x}{2^{23}}\right)
 <li class="fragment">On utilise le décalage à droite dans le code à la ligne suivante:</li>
 </ul>
 <div class="fragment">
-<div class="sourceCode" id="cb22" data-code-line-numbers="8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
-<span id="cb22-2"><a href=""></a></span>
-<span id="cb22-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
-<span id="cb22-4"><a href=""></a>    </span>
-<span id="cb22-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
-<span id="cb22-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
-<span id="cb22-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
-<span id="cb22-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
-<span id="cb22-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
-<span id="cb22-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
-<span id="cb22-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
-<span id="cb22-12"><a href=""></a>    </span>
-<span id="cb22-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21" data-code-line-numbers="8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb21-2"><a href=""></a></span>
+<span id="cb21-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb21-4"><a href=""></a>    </span>
+<span id="cb21-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb21-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb21-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb21-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb21-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb21-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb21-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb21-12"><a href=""></a>    </span>
+<span id="cb21-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section>
 <section>
@@ -1176,6 +1160,17 @@ x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
 \]</span></p>
 </div>
 </section>
+<section id="la-méthode-de-newton-2" class="slide level2">
+<h2>La méthode de Newton</h2>
+<div class="fragment">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="https://upload.wikimedia.org/wikipedia/commons/e/e0/NewtonIteration_Ani.gif"></p>
+<figcaption>La méthode de Newton animée</figcaption>
+</figure>
+</div>
+</div>
+</section>
 <section id="la-méthode-de-newton-pour-frac1sqrtx" class="slide level2">
 <h2>La méthode de Newton pour <span class="math inline">\(\frac{1}{\sqrt{x}}\)</span></h2>
 <ul>
@@ -1189,7 +1184,7 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 </div>
 <div class="fragment">
 <p>qui est exactement la ligne</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="la-méthode-de-newton-pour-frac1sqrtx-1" class="slide level2">
@@ -1198,7 +1193,32 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <li class="fragment">On utilise la méthode de Newton dans le code à la ligne suivante:</li>
 </ul>
 <div class="fragment">
-<div class="sourceCode" id="cb24" data-code-line-numbers="10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb23" data-code-line-numbers="10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb23-2"><a href=""></a></span>
+<span id="cb23-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb23-4"><a href=""></a>    </span>
+<span id="cb23-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb23-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb23-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb23-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb23-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb23-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb23-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb23-12"><a href=""></a>    </span>
+<span id="cb23-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li class="fragment">La ligne 11 nous indique qu’une deuxième itération n’est pas nécessaire.</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="q_rsqrt-1" class="title-slide slide level1 center" data-background-color="black">
+<h1><code>Q_rsqrt</code></h1>
+
+</section>
+<section id="q_rsqrt-2" class="slide level2">
+<h2><code>Q_rsqrt</code></h2>
+<div class="sourceCode" id="cb24" data-code-line-numbers="|3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb24-2"><a href=""></a></span>
 <span id="cb24-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb24-4"><a href=""></a>    </span>
@@ -1212,18 +1232,12 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb24-12"><a href=""></a>    </span>
 <span id="cb24-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
-<li class="fragment">La ligne 11 nous indique qu’une deuxième itération n’est pas nécessaire.</li>
+<li class="fragment">On assigne la valeur <span class="math inline">\(\frac{3}{2}\)</span> à la variable <code>threehalfs</code>.</li>
 </ul>
-</div>
-</section></section>
-<section>
-<section id="q_rsqrt-1" class="title-slide slide level1 center" data-background-color="black">
-<h1><code>Q_rsqrt</code></h1>
-
 </section>
-<section id="q_rsqrt-2" class="slide level2">
+<section id="q_rsqrt-3" class="slide level2">
 <h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb25" data-code-line-numbers="|3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb25" data-code-line-numbers="5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb25-2"><a href=""></a></span>
 <span id="cb25-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb25-4"><a href=""></a>    </span>
@@ -1236,13 +1250,15 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb25-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
 <span id="cb25-12"><a href=""></a>    </span>
 <span id="cb25-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div>
 <ul>
-<li class="fragment">On assigne la valeur <span class="math inline">\(\frac{3}{2}\)</span> à la variable <code>threehalfs</code>.</li>
+<li>On multiplie le nombre dont on veut trouver l’inverse de la racine carrée par <span class="math inline">\(0,5\)</span>.</li>
 </ul>
+</div>
 </section>
-<section id="q_rsqrt-3" class="slide level2">
+<section id="q_rsqrt-4" class="slide level2">
 <h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb26" data-code-line-numbers="5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb26" data-code-line-numbers="6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb26-2"><a href=""></a></span>
 <span id="cb26-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb26-4"><a href=""></a>    </span>
@@ -1257,13 +1273,13 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb26-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div>
 <ul>
-<li>On multiplie le nombre dont on veut trouver l’inverse de la racine carrée par <span class="math inline">\(0,5\)</span>.</li>
+<li>On mémorise le nombre dans la variable <code>y</code> qui est un nombre à virgule flottante <code>simple précision</code>.</li>
 </ul>
 </div>
 </section>
-<section id="q_rsqrt-4" class="slide level2">
+<section id="q_rsqrt-5" class="slide level2">
 <h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb27" data-code-line-numbers="6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb27" data-code-line-numbers="7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb27-2"><a href=""></a></span>
 <span id="cb27-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb27-4"><a href=""></a>    </span>
@@ -1278,13 +1294,13 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb27-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div>
 <ul>
-<li>On mémorise le nombre dans la variable <code>y</code> qui est représentée en mode <code>simple précision</code>.</li>
+<li>On <em>interprète</em> la valeur mémorisée de <span class="math inline">\(y\)</span> comme un <code>entier long</code>, plutôt que comme un nombre à virgule flottante <code>simple précision</code>.</li>
 </ul>
 </div>
 </section>
-<section id="q_rsqrt-5" class="slide level2">
+<section id="q_rsqrt-6" class="slide level2">
 <h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb28" data-code-line-numbers="7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb28" data-code-line-numbers="8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb28-2"><a href=""></a></span>
 <span id="cb28-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb28-4"><a href=""></a>    </span>
@@ -1299,13 +1315,13 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb28-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div>
 <ul>
-<li>On <em>interprète</em> la valeur mémorisée de <span class="math inline">\(y\)</span> comme un <code>entier long</code>, plutôt que comme un nombre à virgule flottante <code>simple précision</code>.</li>
+<li>On effectue une soustraction et un décalage à droite (qui divise la variable <span class="math inline">\(i\)</span> par deux).</li>
 </ul>
 </div>
 </section>
-<section id="q_rsqrt-6" class="slide level2">
+<section id="q_rsqrt-7" class="slide level2">
 <h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb29" data-code-line-numbers="8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb29" data-code-line-numbers="9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb29-2"><a href=""></a></span>
 <span id="cb29-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb29-4"><a href=""></a>    </span>
@@ -1320,13 +1336,13 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb29-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div>
 <ul>
-<li>On effectue une soustraction et un décalage à droite (qui divise la variable <span class="math inline">\(i\)</span> par deux).</li>
+<li>On <em>réinterprète</em> la valeur mémorisée de <span class="math inline">\(i\)</span> comme un nombre à virgule flottante <code>simple précision</code>, plutôt que comme un <code>entier long</code>.</li>
 </ul>
 </div>
 </section>
-<section id="q_rsqrt-7" class="slide level2">
+<section id="q_rsqrt-8" class="slide level2">
 <h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb30" data-code-line-numbers="9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb30" data-code-line-numbers="10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb30-2"><a href=""></a></span>
 <span id="cb30-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb30-4"><a href=""></a>    </span>
@@ -1341,13 +1357,13 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb30-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div>
 <ul>
-<li>On <em>réinterprète</em> la valeur mémorisée de <span class="math inline">\(i\)</span> comme un nombre à virgule flottante <code>simple précision</code>, plutôt que comme un <code>entier long</code>.</li>
+<li>On effectue une itération de la méthode de Newton.</li>
 </ul>
 </div>
 </section>
-<section id="q_rsqrt-8" class="slide level2">
+<section id="q_rsqrt-9" class="slide level2">
 <h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb31" data-code-line-numbers="10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<div class="sourceCode" id="cb31" data-code-line-numbers="11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
 <span id="cb31-2"><a href=""></a></span>
 <span id="cb31-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
 <span id="cb31-4"><a href=""></a>    </span>
@@ -1360,27 +1376,6 @@ y_{n+1} = \frac{y_n(3-xy_n^2)}{2} = y_n \left( \frac{3}{2}-\frac{x}{2}y_n^2 \rig
 <span id="cb31-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
 <span id="cb31-12"><a href=""></a>    </span>
 <span id="cb31-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div>
-<ul>
-<li>On effectue une itération de la méthode de Newton.</li>
-</ul>
-</div>
-</section>
-<section id="q_rsqrt-9" class="slide level2">
-<h2><code>Q_rsqrt</code></h2>
-<div class="sourceCode" id="cb32" data-code-line-numbers="11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
-<span id="cb32-2"><a href=""></a></span>
-<span id="cb32-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
-<span id="cb32-4"><a href=""></a>    </span>
-<span id="cb32-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
-<span id="cb32-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
-<span id="cb32-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
-<span id="cb32-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
-<span id="cb32-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
-<span id="cb32-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
-<span id="cb32-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
-<span id="cb32-12"><a href=""></a>    </span>
-<span id="cb32-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div>
 <ul>
 <li>La deuxième itération de la méthode de Newton n’est pas nécessaire!</li>
@@ -1441,16 +1436,66 @@ N_x = 2^{E_x-B} \cdot \left(1+\frac{M_x}{L}\right)
 </section>
 <section id="evil-floating-point-bit-level-hacking-3" class="slide level2">
 <h2><em>evil floating point bit level hacking</em></h2>
-
-<img data-src="index_files/figure-revealjs/unnamed-chunk-29-7.png" width="960" class="r-stretch"></section>
+<p><span class="math display">\[
+\log_2 \left(1+\frac{M_x}{L}\right) \approx \frac{M_x}{L} + \sigma
+\]</span></p>
+<ul>
+<li class="fragment"><span class="math inline">\(\sigma\)</span> est un paramètre qui permet d’ajuster l’approximation.</li>
+<li class="fragment">Par exemple, si <span class="math inline">\(\sigma=0\)</span>, l’approximation est exacte aux extrémités de l’intervalle.</li>
+</ul>
+</section>
 <section id="evil-floating-point-bit-level-hacking-4" class="slide level2">
 <h2><em>evil floating point bit level hacking</em></h2>
 
-<img data-src="index_files/figure-revealjs/unnamed-chunk-30-9.png" width="960" class="r-stretch"><div class="fragment">
-<div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<img data-src="index_files/figure-revealjs/unnamed-chunk-29-7.png" width="960" class="r-stretch"></section>
+<section id="evil-floating-point-bit-level-hacking-5" class="slide level2">
+<h2><em>evil floating point bit level hacking</em></h2>
+<p><span class="math display">\[
+\log_2 \left(1+\frac{M_x}{L}\right) \approx \frac{M_x}{L} + \sigma
+\]</span></p>
+<div>
+<ul>
+<li><span class="math inline">\(\sigma\)</span> est un paramètre qui permet d’ajuster l’approximation.</li>
+<li>Par exemple, si <span class="math inline">\(\sigma=0\)</span>, l’approximation est exacte aux extrémités de l’intervalle.</li>
+</ul>
+</div>
+<ul>
+<li class="fragment">Si nous choisissons <span class="math inline">\(\sigma=\frac{1}{2}-\frac{1+\ln(\ln(2))}{2\ln(2)}\approx 0,0430357\)</span>, ça permet de minimiser l’erreur uniforme.</li>
+</ul>
+</section>
+<section id="evil-floating-point-bit-level-hacking-6" class="slide level2">
+<h2><em>evil floating point bit level hacking</em></h2>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-30-9.png" width="960" class="r-stretch"></section>
+<section id="evil-floating-point-bit-level-hacking-7" class="slide level2">
+<h2><em>evil floating point bit level hacking</em></h2>
+<p><span class="math display">\[
+\log_2 \left(1+\frac{M_x}{L}\right) \approx \frac{M_x}{L} + \sigma
+\]</span></p>
+<div>
+<ul>
+<li><span class="math inline">\(\sigma\)</span> est un paramètre qui permet d’ajuster l’approximation.</li>
+<li>Par exemple, si <span class="math inline">\(\sigma=0\)</span>, l’approximation est exacte aux extrémités de l’intervalle.</li>
+<li>Si nous choisissons <span class="math inline">\(\sigma=\frac{1}{2}-\frac{1+\ln(\ln(2))}{2\ln(2)}\approx 0,0430357\)</span>, ça permet de minimiser l’erreur uniforme.</li>
+</ul>
+</div>
+<ul>
+<li class="fragment">Par contre, ce n’est pas la valeur choisie car elle ne tient pas compte des autres étapes de l’algorithme.</li>
+<li class="fragment">La valeur choisie est <span class="math inline">\(\sigma\approx0,04504656791687012\)</span>.</li>
+</ul>
+</section>
+<section id="evil-floating-point-bit-level-hacking-8" class="slide level2">
+<h2><em>evil floating point bit level hacking</em></h2>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-31-11.png" width="960" class="r-stretch"></section>
+<section id="evil-floating-point-bit-level-hacking-9" class="slide level2">
+<h2><em>evil floating point bit level hacking</em></h2>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-32-13.png" width="960" class="r-stretch"><div class="fragment">
+<div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="evil-floating-point-bit-level-hacking-5" class="slide level2">
+<section id="evil-floating-point-bit-level-hacking-10" class="slide level2">
 <h2><em>evil floating point bit level hacking</em></h2>
 <p><span class="math display">\[
 \log_2 (N_x) = E_x-B + \log_2 \left(1+\frac{M_x}{L}\right)
@@ -1476,7 +1521,7 @@ E_x\cdot L \approx L\cdot \log_2 (N_x) - M_x +L(B-\sigma)
 \]</span></p>
 </div>
 </section>
-<section id="evil-floating-point-bit-level-hacking-6" class="slide level2">
+<section id="evil-floating-point-bit-level-hacking-11" class="slide level2">
 <h2><em>evil floating point bit level hacking</em></h2>
 <p>Lorsqu’on interprète un nombre en virgule flottante comme un entier, nous avons: <span class="math inline">\(R_x=E_x \cdot L + M_x\)</span>.</p>
 <div class="fragment">
@@ -1488,7 +1533,7 @@ R_x \approx L\log_2(N_x) + L(B-\sigma)
 \]</span></p>
 </div>
 </section>
-<section id="evil-floating-point-bit-level-hacking-7" class="slide level2">
+<section id="evil-floating-point-bit-level-hacking-12" class="slide level2">
 <h2><em>evil floating point bit level hacking</em></h2>
 <ul>
 <li class="fragment">Si <span class="math inline">\(y=\frac{1}{\sqrt{x}}\)</span> alors <span class="math inline">\(\log_2(y) = -\frac{1}{2}\log_2(x)\)</span>.</li>
@@ -1501,19 +1546,185 @@ R_y &amp;= \frac{3}{2}L(B-\sigma) - \frac{1}{2}R_x
 \end{aligned}\]</span>
 </div>
 <div class="fragment">
+<div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="magic-number" class="slide level2">
+<h2><em>Magic number</em></h2>
+<div class="fragment">
+<p><span class="math display">\[
+R_y = \frac{3}{2}L(B-\sigma) - \frac{1}{2}R_x
+\]</span></p>
+</div>
+<div class="fragment">
 <div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<p>Le premier terme de droite de l’équation est le nombre magique.</p>
+</div>
+<div class="fragment">
+<p><span class="math display">\[
+\frac{3}{2}L(B-\sigma) = 0x5F3759DF
+\]</span></p>
+</div>
+<div class="fragment">
+<p>La valeur de <span class="math inline">\(\sigma\)</span> est donc <span class="math inline">\(\sigma \approx 0,0450466\)</span>.</p>
 </div>
 </section></section>
 <section>
 <section id="un-exemple" class="title-slide slide level1 center" data-background-color="black">
 <h1>Un exemple</h1>
-
+<div class="fragment">
+<p>Nous allons calculer <span class="math inline">\(\frac{1}{\sqrt{\pi}}\)</span></p>
+</div>
 </section>
-<section id="un-exemple-1" class="slide level2">
-<h2>Un exemple</h2>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb35-2"><a href=""></a></span>
+<span id="cb35-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb35-4"><a href=""></a>    </span>
+<span id="cb35-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb35-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb35-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb35-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb35-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb35-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb35-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb35-12"><a href=""></a>    </span>
+<span id="cb35-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="section-4" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb36-2"><a href=""></a></span>
+<span id="cb36-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb36-4"><a href=""></a>    </span>
+<span id="cb36-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb36-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb36-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb36-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb36-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb36-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb36-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb36-12"><a href=""></a>    </span>
+<span id="cb36-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>On assigne à la variable <code>number</code>, la valeur de <span class="math inline">\(\pi\)</span>.</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-33-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"></section>
+<section id="section-5" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb37" data-code-line-numbers="6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb37-2"><a href=""></a></span>
+<span id="cb37-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb37-4"><a href=""></a>    </span>
+<span id="cb37-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb37-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb37-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb37-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb37-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb37-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb37-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb37-12"><a href=""></a>    </span>
+<span id="cb37-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La variable <code>y</code> est un nombre à virgule flottante <code>simple précision</code>.</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-34-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"></section>
+<section id="section-6" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb38" data-code-line-numbers="7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb38-2"><a href=""></a></span>
+<span id="cb38-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb38-4"><a href=""></a>    </span>
+<span id="cb38-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb38-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb38-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb38-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb38-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb38-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb38-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb38-12"><a href=""></a>    </span>
+<span id="cb38-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>On <em>interprète</em> la valeur mémorisée <code>y</code> comme un <code>entier long</code>, plutôt que comme un nombre à virgule flottante <code>simple précision</code>,</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-35-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"></section>
+<section id="section-7" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb39" data-code-line-numbers="8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb39-2"><a href=""></a></span>
+<span id="cb39-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb39-4"><a href=""></a>    </span>
+<span id="cb39-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb39-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb39-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb39-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb39-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb39-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb39-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb39-12"><a href=""></a>    </span>
+<span id="cb39-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>On effectue le décalage à droite de la variable <code>i</code></p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-36-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"></section>
+<section id="section-8" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb40" data-code-line-numbers="8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb40-2"><a href=""></a></span>
+<span id="cb40-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb40-4"><a href=""></a>    </span>
+<span id="cb40-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb40-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb40-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb40-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb40-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb40-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb40-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb40-12"><a href=""></a>    </span>
+<span id="cb40-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La variable <code>i</code> est obtenue en soustrayant le décalage à droite précédent et la <em>magic number</em> <span class="math inline">\(0x5F3759DF\)</span>.</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-37-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"></section>
+<section id="section-9" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb41" data-code-line-numbers="9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb41-2"><a href=""></a></span>
+<span id="cb41-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb41-4"><a href=""></a>    </span>
+<span id="cb41-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb41-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb41-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb41-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb41-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb41-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb41-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb41-12"><a href=""></a>    </span>
+<span id="cb41-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>On <em>réinterprète</em> la variable <code>i</code> comme un nombre à virgule flottante <code>simple précision</code>.</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-38-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"></section>
+<section id="section-10" class="slide level2">
+<h2></h2>
+<div class="sourceCode" id="cb42" data-code-line-numbers="10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href=""></a><span class="kw">def</span> Q_rsqrt(number):</span>
+<span id="cb42-2"><a href=""></a></span>
+<span id="cb42-3"><a href=""></a>    threehalfs <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb42-4"><a href=""></a>    </span>
+<span id="cb42-5"><a href=""></a>    x2 <span class="op">=</span> number <span class="op">*</span> <span class="fl">0.5</span></span>
+<span id="cb42-6"><a href=""></a>    y <span class="op">=</span> np.float32(number)                    </span>
+<span id="cb42-7"><a href=""></a>    i <span class="op">=</span> y.view(np.int32)                          <span class="co"># evil floating point bit level hacking</span></span>
+<span id="cb42-8"><a href=""></a>    i <span class="op">=</span> np.int32(<span class="bn">0x5f3759df</span>) <span class="op">-</span> np.int32(i <span class="op">&gt;&gt;</span> <span class="dv">1</span>)   <span class="co"># what the fuck?</span></span>
+<span id="cb42-9"><a href=""></a>    y <span class="op">=</span> i.view(np.float32)</span>
+<span id="cb42-10"><a href=""></a>    y <span class="op">=</span> y <span class="op">*</span> (threehalfs <span class="op">-</span> (x2 <span class="op">*</span> y <span class="op">*</span> y))           <span class="co"># 1st iteration</span></span>
+<span id="cb42-11"><a href=""></a>    <span class="co"># y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed</span></span>
+<span id="cb42-12"><a href=""></a>    </span>
+<span id="cb42-13"><a href=""></a>    <span class="cf">return</span> <span class="bu">float</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>On effectue une itération de la méthode Newton.</p>
+
+<img data-src="index_files/figure-revealjs/unnamed-chunk-39-1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"><div class="fragment">
+<p>La valeur réelle est <span class="math inline">\(\frac{1}{\sqrt{\pi}}=0,56418958\ldots\)</span></p>
 <div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
+</div>
 </div>
 </div>
 </section></section>

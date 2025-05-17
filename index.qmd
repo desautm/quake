@@ -8,10 +8,13 @@ editor: visual
 title-slide-attributes:
   data-background-color: "black"
 highlight-style: github-dark
+execute: 
+  cache: true
 ---
 
 ```{r}
 #| label: setup-r
+#| output: false
 library("reticulate")
 use_python("C:/Users/mdesautels/AppData/Local/Programs/Python/Python312")
 py_require("matplotlib")
@@ -21,6 +24,7 @@ py_config()
 
 ```{python}
 #| label: setup-python
+#| output: false
 import numpy as np
 import matplotlib.pyplot as plt
 ```
@@ -1605,6 +1609,12 @@ $$
 x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
 $$
 
+## La méthode de Newton
+
+. . .
+
+![La méthode de Newton animée](https://upload.wikimedia.org/wikipedia/commons/e/e0/NewtonIteration_Ani.gif)
+
 ## La méthode de Newton pour $\frac{1}{\sqrt{x}}$
 
 - Considérons la fonction $f(y)=\frac{1}{y^2}-x$, qui possède comme zéro $y=\frac{1}{\sqrt{x}}$.
@@ -1711,7 +1721,7 @@ def Q_rsqrt(number):
 ```
 
 ::: {.nonincremental}
-- On mémorise le nombre dans la variable `y` qui est représentée en mode `simple précision`.
+- On mémorise le nombre dans la variable `y` qui est un nombre à virgule flottante `simple précision`.
 :::
 
 ## `Q_rsqrt`
@@ -1841,8 +1851,8 @@ x = np.float32(x)
 y = x.view(np.int32)
 
 ax.plot(x, y)
-plt.xlabel("Nombre à virgule flottante")
-plt.ylabel("Représentation comme un entier")
+plt.xlabel("Nombre à virgule flottante", fontsize=15)
+plt.ylabel("Représentation comme un entier", fontsize=15)
 plt.show()
 ```
 
@@ -1883,6 +1893,15 @@ $$
 
 ## *evil floating point bit level hacking*
 
+$$
+\log_2 \left(1+\frac{M_x}{L}\right) \approx \frac{M_x}{L} + \sigma
+$$
+
+- $\sigma$ est un paramètre qui permet d'ajuster l'approximation.
+- Par exemple, si $\sigma=0$, l'approximation est exacte aux extrémités de l'intervalle.
+
+## *evil floating point bit level hacking*
+
 ```{python}
 import numpy as np
 import matplotlib.pyplot as plt
@@ -1903,11 +1922,100 @@ y1 = np.log2(1+x)
 y2 = x + sigma1
 y3 = x + sigma2
 
-ax.plot(x, y1, color = "blue", label = "log_2(1+x)")
+ax.plot(x, y1, color = "blue", label = r"$log_2(1+x)$")
 ax.plot(x, x, color = "red", label = "x")
 #ax.plot(x, y3, color = "green", label = "x+0,04504656791687012")
-plt.xlabel("x")
-plt.legend()
+plt.xlabel("x",fontsize=15)
+plt.legend(fontsize=15)
+plt.show()
+```
+
+## *evil floating point bit level hacking*
+
+$$
+\log_2 \left(1+\frac{M_x}{L}\right) \approx \frac{M_x}{L} + \sigma
+$$
+
+::: {.nonincremental}
+- $\sigma$ est un paramètre qui permet d'ajuster l'approximation.
+- Par exemple, si $\sigma=0$, l'approximation est exacte aux extrémités de l'intervalle.
+:::
+
+- Si nous choisissons $\sigma=\frac{1}{2}-\frac{1+\ln(\ln(2))}{2\ln(2)}\approx 0,0430357$, ça permet de minimiser l'erreur uniforme.
+
+## *evil floating point bit level hacking*
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+fig, ax = plt.subplots()
+
+ln2 = math.log(2)
+lnln2 = math.log(ln2)
+sigma1 = (0.5 - (1+lnln2)/(2*ln2))
+L = 2**23
+B = 127
+magic = 0x5F3759DF
+sigma2 = B - 2 * magic / (3 * L)
+
+x = np.linspace(0, 1, 1000)
+y1 = np.log2(1+x)
+y2 = x + sigma1
+y3 = x + sigma2
+
+ax.plot(x, y1, color = "blue", label = r"$log_2(1+x)$")
+ax.plot(x, x, color = "red", label = "x")
+ax.plot(x, y2, color = "black", label = r"$x+\frac{1}{2}-\frac{1+\ln(\ln(2))}{2\ln(2)}$")
+plt.xlabel("x",fontsize=15)
+plt.legend(fontsize=15)
+plt.show()
+```
+
+## *evil floating point bit level hacking*
+
+$$
+\log_2 \left(1+\frac{M_x}{L}\right) \approx \frac{M_x}{L} + \sigma
+$$
+
+::: {.nonincremental}
+- $\sigma$ est un paramètre qui permet d'ajuster l'approximation.
+- Par exemple, si $\sigma=0$, l'approximation est exacte aux extrémités de l'intervalle.
+- Si nous choisissons $\sigma=\frac{1}{2}-\frac{1+\ln(\ln(2))}{2\ln(2)}\approx 0,0430357$, ça permet de minimiser l'erreur uniforme.
+:::
+
+- Par contre, ce n'est pas la valeur choisie car elle ne tient pas compte des autres étapes de l'algorithme.
+- La valeur choisie est $\sigma\approx0,04504656791687012$.
+
+## *evil floating point bit level hacking*
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+
+fig, ax = plt.subplots()
+
+ln2 = math.log(2)
+lnln2 = math.log(ln2)
+sigma1 = (0.5 - (1+lnln2)/(2*ln2))
+L = 2**23
+B = 127
+magic = 0x5F3759DF
+sigma2 = B - 2 * magic / (3 * L)
+
+x = np.linspace(0, 1, 1000)
+y1 = np.log2(1+x)
+y2 = x + sigma1
+y3 = x + sigma2
+
+ax.plot(x, y1, color = "blue", label = r"$log_2(1+x)$")
+ax.plot(x, x, color = "red", label = "x")
+ax.plot(x, y2, color = "black", label = r"$x+\frac{1}{2}-\frac{1+\ln(\ln(2))}{2\ln(2)}$")
+ax.plot(x, y3, color = "green", label = "x+0,04504656791687012")
+plt.xlabel("x",fontsize=15)
+plt.legend(fontsize=15)
 plt.show()
 ```
 
@@ -1933,11 +2041,11 @@ y1 = np.log2(1+x)
 y2 = x + sigma1
 y3 = x + sigma2
 
-ax.plot(x, y1, color = "blue", label = "log_2(1+x)")
+ax.plot(x, y1, color = "blue", label = r"$log_2(1+x)$")
 ax.plot(x, x, color = "red", label = "x")
 ax.plot(x, y3, color = "green", label = "x+0,04504656791687012")
-plt.xlabel("x")
-plt.legend()
+plt.xlabel("x",fontsize=15)
+plt.legend(fontsize=15)
 plt.show()
 ```
 
@@ -2009,19 +2117,683 @@ R_y &= \frac{3}{2}L(B-\sigma) - \frac{1}{2}R_x
 i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
 ```
 
+## *Magic number*
+
+. . .
+
+$$
+R_y = \frac{3}{2}L(B-\sigma) - \frac{1}{2}R_x
+$$
+
+. . .
+
+```{.python code-line-numbers="false"}
+i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+```
+
+. . .
+
+Le premier terme de droite de l'équation est le nombre magique.
+
+. . .
+
+$$
+\frac{3}{2}L(B-\sigma) = 0x5F3759DF
+$$
+
+. . .
+
+La valeur de $\sigma$ est donc $\sigma \approx 0,0450466$.
+
 # Un exemple {background-color="black"}
 
-## Un exemple
+. . .
 
+Nous allons calculer $\frac{1}{\sqrt{\pi}}$
 
+## 
 
+```{.python}
+def Q_rsqrt(number):
 
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
 
+## 
 
+```{.python code-line-numbers="1"}
+def Q_rsqrt(number):
 
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
 
+On assigne à la variable `number`, la valeur de $\pi$.
 
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
 
+\begin{tikzpicture}
 
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
 
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
 
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 0}; 
+& \node (f-27) [exposant] {\Large 0}; 
+& \node (f-26) [exposant] {\Large 0}; 
+& \node (f-25) [exposant] {\Large 0}; 
+& \node (f-24) [exposant] {\Large 0}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 0}; 
+& \node (f-19) [mantisse] {\Large 1}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 1}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+\draw[red] ([shift=({0,0.1cm})]f-31.north)--++(0,0.25) node[above] {signe};
+
+\draw[green] ([shift=({0,0.1cm})]f-30.north)--++(0,0.25)--([shift=({0,0.35cm})]f-23.north) node[midway, above] {exposant (8 bits)} --++(0,-0.25);
+
+\draw[blue] ([shift=({0,0.1cm})]f-22.north)--++(0,0.25)--([shift=({0,0.35cm})]f-0.north) node[midway, above] {mantisse (23 bits)} --++(0,-0.25);
+
+\foreach \i in {0,22,23,30,31}{
+    \draw[fill=black] ([shift=({0,-0.1cm})]f-\i.south) circle (1pt) node[below] {\i};
+}
+
+% \draw ([shift=({0,1cm})]f-16.north) node[above] {\Large $\pi$};
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 3,14159$};
+
+\end{tikzpicture}
+```
+
+## 
+
+```{.python code-line-numbers="6"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+La variable `y` est un nombre à virgule flottante `simple précision`.
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 0}; 
+& \node (f-27) [exposant] {\Large 0}; 
+& \node (f-26) [exposant] {\Large 0}; 
+& \node (f-25) [exposant] {\Large 0}; 
+& \node (f-24) [exposant] {\Large 0}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 0}; 
+& \node (f-19) [mantisse] {\Large 1}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 1}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 3,14159$};
+
+% \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large Représentation de $\pi$ comme un nombre en virgule flottante};
+
+\end{tikzpicture}
+```
+
+## 
+
+```{.python code-line-numbers="7"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+On *interprète* la valeur mémorisée `y` comme un `entier long`, plutôt que comme un nombre à virgule flottante `simple précision`,
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=blue!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 0}; 
+& \node (f-27) [exposant] {\Large 0}; 
+& \node (f-26) [exposant] {\Large 0}; 
+& \node (f-25) [exposant] {\Large 0}; 
+& \node (f-24) [exposant] {\Large 0}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 0}; 
+& \node (f-19) [mantisse] {\Large 1}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 1}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1078530000$};
+
+% \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large Représentation de $\pi$ comme un nombre en virgule flottante};
+
+\end{tikzpicture}
+```
+
+## 
+
+```{.python code-line-numbers="8"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+On effectue le décalage à droite de la variable `i`
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=blue!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm, row sep=1cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 0}; 
+& \node (f-27) [exposant] {\Large 0}; 
+& \node (f-26) [exposant] {\Large 0}; 
+& \node (f-25) [exposant] {\Large 0}; 
+& \node (f-24) [exposant] {\Large 0}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 1}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 0}; 
+& \node (f-19) [mantisse] {\Large 1}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 1}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 0};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 0};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+\node (g-31) [signe] {\Large 0}; 
+
+& \node (g-30) [exposant] {\Large 0}; 
+& \node (g-29) [exposant] {\Large 0}; 
+& \node (g-28) [exposant] {\Large 1}; 
+& \node (g-27) [exposant] {\Large 0}; 
+& \node (g-26) [exposant] {\Large 0}; 
+& \node (g-25) [exposant] {\Large 0}; 
+& \node (g-24) [exposant] {\Large 0}; 
+& \node (g-23) [exposant] {\Large 0}; 
+
+& \node (g-22) [mantisse] {\Large 0}; 
+& \node (g-21) [mantisse] {\Large 1}; 
+& \node (g-20) [mantisse] {\Large 0}; 
+& \node (g-19) [mantisse] {\Large 0}; 
+& \node (g-18) [mantisse] {\Large 1}; 
+& \node (g-17) [mantisse] {\Large 0}; 
+& \node (g-16) [mantisse] {\Large 0}; 
+& \node (g-15) [mantisse] {\Large 1};
+& \node (g-14) [mantisse] {\Large 0};
+& \node (g-13) [mantisse] {\Large 0};
+& \node (g-12) [mantisse] {\Large 0};
+& \node (g-11) [mantisse] {\Large 0};
+& \node (g-10) [mantisse] {\Large 1};
+& \node (g-9) [mantisse] {\Large 1};
+& \node (g-8) [mantisse] {\Large 1};
+& \node (g-7) [mantisse] {\Large 1};
+& \node (g-6) [mantisse] {\Large 1};
+& \node (g-5) [mantisse] {\Large 1};
+& \node (g-4) [mantisse] {\Large 0};
+& \node (g-3) [mantisse] {\Large 1};
+& \node (g-2) [mantisse] {\Large 1};
+& \node (g-1) [mantisse] {\Large 0};
+& \node (g-0) [mantisse] {\Large 1};  
+\\
+};
+
+% \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large Décalage vers la droite};
+
+\foreach \i [evaluate=\i as \j using int(\i-1)] in {31,30,...,1}{
+    \draw[->,very thick] (f-\i.south)--(g-\j.north);
+}
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1078530000$};
+
+\draw ([shift=({0,0cm})]g-0.east) node[right] {\Large $= 539265000$};
+
+\end{tikzpicture}
+```
+
+## 
+
+```{.python code-line-numbers="8"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+La variable `i` est obtenue en soustrayant le décalage à droite précédent et la *magic number* $0x5F3759DF$.
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=blue!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 1}; 
+& \node (f-27) [exposant] {\Large 1}; 
+& \node (f-26) [exposant] {\Large 1}; 
+& \node (f-25) [exposant] {\Large 1}; 
+& \node (f-24) [exposant] {\Large 1}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 0}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 1}; 
+& \node (f-19) [mantisse] {\Large 0}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 1}; 
+& \node (f-16) [mantisse] {\Large 0}; 
+& \node (f-15) [mantisse] {\Large 1};
+& \node (f-14) [mantisse] {\Large 1};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 1};
+& \node (f-11) [mantisse] {\Large 0};
+& \node (f-10) [mantisse] {\Large 0};
+& \node (f-9) [mantisse] {\Large 0};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 1};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 0};
+& \node (f-2) [mantisse] {\Large 1};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+% \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large \emph{Magic number} $0x5F3759DF$};
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1058198007$};
+
+\end{tikzpicture}
+```
+
+## 
+
+```{.python code-line-numbers="9"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+On *réinterprète* la variable `i` comme un nombre à virgule flottante `simple précision`.
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 1}; 
+& \node (f-27) [exposant] {\Large 1}; 
+& \node (f-26) [exposant] {\Large 1}; 
+& \node (f-25) [exposant] {\Large 1}; 
+& \node (f-24) [exposant] {\Large 1}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 0}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 1}; 
+& \node (f-19) [mantisse] {\Large 0}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 1}; 
+& \node (f-16) [mantisse] {\Large 0}; 
+& \node (f-15) [mantisse] {\Large 1};
+& \node (f-14) [mantisse] {\Large 1};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 1};
+& \node (f-11) [mantisse] {\Large 0};
+& \node (f-10) [mantisse] {\Large 0};
+& \node (f-9) [mantisse] {\Large 0};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 1};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 0};
+& \node (f-2) [mantisse] {\Large 1};
+& \node (f-1) [mantisse] {\Large 1};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+% \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large \emph{Magic number} $0x5F3759DF$};
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 0,5735163$};
+
+\end{tikzpicture}
+```
+
+## 
+
+```{.python code-line-numbers="10"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+On effectue une itération de la méthode Newton.
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 1}; 
+& \node (f-27) [exposant] {\Large 1}; 
+& \node (f-26) [exposant] {\Large 1}; 
+& \node (f-25) [exposant] {\Large 1}; 
+& \node (f-24) [exposant] {\Large 1}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 0}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 1}; 
+& \node (f-19) [mantisse] {\Large 0}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 0}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 1};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 1};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 1};
+& \node (f-6) [mantisse] {\Large 0};
+& \node (f-5) [mantisse] {\Large 0};
+& \node (f-4) [mantisse] {\Large 0};
+& \node (f-3) [mantisse] {\Large 0};
+& \node (f-2) [mantisse] {\Large 0};
+& \node (f-1) [mantisse] {\Large 0};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+% \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large \emph{Magic number} $0x5F3759DF$};
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 0,5639573$};
+
+\end{tikzpicture}
+```
+
+. . .
+
+La valeur réelle est $\frac{1}{\sqrt{\pi}}=0,56418958\ldots$
