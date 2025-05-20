@@ -189,6 +189,8 @@ plt.show()
 
 ```{python}
 #| fig-align: "center"
+import numpy as np
+import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots()
 
@@ -209,6 +211,27 @@ plt.xlabel("x")
 plt.ylabel("y")
 
 plt.legend()
+plt.show()
+```
+
+## Est-ce que cette approximation est bonne?
+
+```{python}
+#| fig-align: "center"
+import numpy as np
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots()
+
+x = np.logspace(start = 0, stop = 4, num = 10**5)
+y1 = 1./np.sqrt(x)
+y2 = [Q_rsqrt(i) for i in x]
+err = abs(y2-y1)/y1
+ax.plot(x, err)
+
+plt.title("L'erreur relative entre l'inverse de la racine carrée et Q_rsqrt")
+plt.xlabel("x")
+ax.set_xscale('log')
 plt.show()
 ```
 
@@ -2209,8 +2232,8 @@ On assigne à la variable `number`, la valeur de $\pi$.
 {
 \node (f-31) [signe] {\Large 0}; 
 
-& \node (f-30) [exposant] {\Large 0}; 
-& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-30) [exposant] {\Large 1}; 
+& \node (f-29) [exposant] {\Large 0}; 
 & \node (f-28) [exposant] {\Large 0}; 
 & \node (f-27) [exposant] {\Large 0}; 
 & \node (f-26) [exposant] {\Large 0}; 
@@ -2256,7 +2279,7 @@ On assigne à la variable `number`, la valeur de $\pi$.
 
 % \draw ([shift=({0,1cm})]f-16.north) node[above] {\Large $\pi$};
 
-\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 3,14159$};
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 3,141592654$};
 
 \end{tikzpicture}
 ```
@@ -2301,8 +2324,8 @@ La variable `y` est un nombre à virgule flottante `simple précision`.
 {
 \node (f-31) [signe] {\Large 0}; 
 
-& \node (f-30) [exposant] {\Large 0}; 
-& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-30) [exposant] {\Large 1}; 
+& \node (f-29) [exposant] {\Large 0}; 
 & \node (f-28) [exposant] {\Large 0}; 
 & \node (f-27) [exposant] {\Large 0}; 
 & \node (f-26) [exposant] {\Large 0}; 
@@ -2336,7 +2359,7 @@ La variable `y` est un nombre à virgule flottante `simple précision`.
 \\
 };
 
-\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 3,14159$};
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 3,141592654$};
 
 % \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large Représentation de $\pi$ comme un nombre en virgule flottante};
 
@@ -2383,8 +2406,8 @@ On *interprète* la valeur mémorisée `y` comme un `entier long`, plutôt que c
 {
 \node (f-31) [signe] {\Large 0}; 
 
-& \node (f-30) [exposant] {\Large 0}; 
-& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-30) [exposant] {\Large 1}; 
+& \node (f-29) [exposant] {\Large 0}; 
 & \node (f-28) [exposant] {\Large 0}; 
 & \node (f-27) [exposant] {\Large 0}; 
 & \node (f-26) [exposant] {\Large 0}; 
@@ -2418,7 +2441,7 @@ On *interprète* la valeur mémorisée `y` comme un `entier long`, plutôt que c
 \\
 };
 
-\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1078530000$};
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1078530011$};
 
 % \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large Représentation de $\pi$ comme un nombre en virgule flottante};
 
@@ -2465,8 +2488,8 @@ On effectue le décalage à droite de la variable `i`
 {
 \node (f-31) [signe] {\Large 0}; 
 
-& \node (f-30) [exposant] {\Large 0}; 
-& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-30) [exposant] {\Large 1}; 
+& \node (f-29) [exposant] {\Large 0}; 
 & \node (f-28) [exposant] {\Large 0}; 
 & \node (f-27) [exposant] {\Large 0}; 
 & \node (f-26) [exposant] {\Large 0}; 
@@ -2501,8 +2524,8 @@ On effectue le décalage à droite de la variable `i`
 \node (g-31) [signe] {\Large 0}; 
 
 & \node (g-30) [exposant] {\Large 0}; 
-& \node (g-29) [exposant] {\Large 0}; 
-& \node (g-28) [exposant] {\Large 1}; 
+& \node (g-29) [exposant] {\Large 1}; 
+& \node (g-28) [exposant] {\Large 0}; 
 & \node (g-27) [exposant] {\Large 0}; 
 & \node (g-26) [exposant] {\Large 0}; 
 & \node (g-25) [exposant] {\Large 0}; 
@@ -2541,9 +2564,9 @@ On effectue le décalage à droite de la variable `i`
     \draw[->,very thick] (f-\i.south)--(g-\j.north);
 }
 
-\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1078530000$};
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1078530011$};
 
-\draw ([shift=({0,0cm})]g-0.east) node[right] {\Large $= 539265000$};
+\draw ([shift=({0,0cm})]g-0.east) node[right] {\Large $= 539265005$};
 
 \end{tikzpicture}
 ```
@@ -2566,7 +2589,7 @@ def Q_rsqrt(number):
     return float(y)
 ```
 
-La variable `i` est obtenue en soustrayant le décalage à droite précédent et la *magic number* $0x5F3759DF$.
+La variable `i` est obtenue en soustrayant le décalage à droite précédent et le *magic number* $0x5F3759DF$.
 
 ```{r engine="tikz", out.width='50%'}
 #| fig-align: "center"
@@ -2617,15 +2640,15 @@ La variable `i` est obtenue en soustrayant le décalage à droite précédent et
 & \node (f-5) [mantisse] {\Large 1};
 & \node (f-4) [mantisse] {\Large 1};
 & \node (f-3) [mantisse] {\Large 0};
-& \node (f-2) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
 & \node (f-1) [mantisse] {\Large 1};
-& \node (f-0) [mantisse] {\Large 1};  
+& \node (f-0) [mantisse] {\Large 0};  
 \\
 };
 
 % \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large \emph{Magic number} $0x5F3759DF$};
 
-\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1058198007$};
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 1058198002$};
 
 \end{tikzpicture}
 ```
@@ -2699,15 +2722,15 @@ On *réinterprète* la variable `i` comme un nombre à virgule flottante `simple
 & \node (f-5) [mantisse] {\Large 1};
 & \node (f-4) [mantisse] {\Large 1};
 & \node (f-3) [mantisse] {\Large 0};
-& \node (f-2) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 0};
 & \node (f-1) [mantisse] {\Large 1};
-& \node (f-0) [mantisse] {\Large 1};  
+& \node (f-0) [mantisse] {\Large 0};    
 \\
 };
 
 % \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large \emph{Magic number} $0x5F3759DF$};
 
-\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 0,5735163$};
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 0,573516$};
 
 \end{tikzpicture}
 ```
@@ -2776,12 +2799,12 @@ On effectue une itération de la méthode Newton.
 & \node (f-10) [mantisse] {\Large 1};
 & \node (f-9) [mantisse] {\Large 1};
 & \node (f-8) [mantisse] {\Large 1};
-& \node (f-7) [mantisse] {\Large 1};
-& \node (f-6) [mantisse] {\Large 0};
-& \node (f-5) [mantisse] {\Large 0};
-& \node (f-4) [mantisse] {\Large 0};
-& \node (f-3) [mantisse] {\Large 0};
-& \node (f-2) [mantisse] {\Large 0};
+& \node (f-7) [mantisse] {\Large 0};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 1};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 1};
 & \node (f-1) [mantisse] {\Large 0};
 & \node (f-0) [mantisse] {\Large 1};  
 \\
@@ -2789,7 +2812,7 @@ On effectue une itération de la méthode Newton.
 
 % \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large \emph{Magic number} $0x5F3759DF$};
 
-\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 0,5639573$};
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 0,56395704$};
 
 \end{tikzpicture}
 ```
@@ -2797,3 +2820,14 @@ On effectue une itération de la méthode Newton.
 . . .
 
 La valeur réelle est $\frac{1}{\sqrt{\pi}}=0,56418958\ldots$
+
+# Devrait-on utiliser cette fonction? {background-color="black"}
+
+. . .
+
+Non...
+
+## Pourquoi ne pas utiliser ce code?
+
+- Les ajouts des fabricants de matériel ont rendu cet algorithme en grande partie obsolète. 
+- Par exemple, sur l'architecture x86, Intel a introduit l'instruction SSE **rsqrtss** en 1999. Cette instruction prend 0,85 ns par nombre flottant, contre 3,54 ns pour l'algorithme rapide d'inverse de racine carrée, tout en ayant une erreur moindre.
