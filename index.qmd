@@ -1691,7 +1691,27 @@ def Q_rsqrt(number):
     return float(y)
 ```
 
+## La méthode de Newton pour $\frac{1}{\sqrt{x}}$
+
+::: {.nonincremental}
 - La ligne 11 nous indique qu'une deuxième itération n'est pas nécessaire.
+:::
+
+```{.python code-line-numbers="11"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
 
 # `Q_rsqrt` {background-color="black"}
 
@@ -2779,6 +2799,88 @@ def Q_rsqrt(number):
 ```
 
 On effectue une itération de la méthode Newton.
+
+```{r engine="tikz", out.width='50%'}
+#| fig-align: "center"
+
+\begin{tikzpicture}
+
+\tikzset{
+    box/.style = {
+    minimum height=1cm,
+    minimum width = 0.6cm
+    }
+}
+
+\tikzstyle{signe}=[draw, very thick, fill=red!20!white, box]
+\tikzstyle{exposant}=[draw, very thick, fill=green!20!white, box]
+\tikzstyle{mantisse}=[draw, very thick, fill=blue!20!white, box]
+
+\matrix [column sep=0cm]
+{
+\node (f-31) [signe] {\Large 0}; 
+
+& \node (f-30) [exposant] {\Large 0}; 
+& \node (f-29) [exposant] {\Large 1}; 
+& \node (f-28) [exposant] {\Large 1}; 
+& \node (f-27) [exposant] {\Large 1}; 
+& \node (f-26) [exposant] {\Large 1}; 
+& \node (f-25) [exposant] {\Large 1}; 
+& \node (f-24) [exposant] {\Large 1}; 
+& \node (f-23) [exposant] {\Large 0}; 
+
+& \node (f-22) [mantisse] {\Large 0}; 
+& \node (f-21) [mantisse] {\Large 0}; 
+& \node (f-20) [mantisse] {\Large 1}; 
+& \node (f-19) [mantisse] {\Large 0}; 
+& \node (f-18) [mantisse] {\Large 0}; 
+& \node (f-17) [mantisse] {\Large 0}; 
+& \node (f-16) [mantisse] {\Large 0}; 
+& \node (f-15) [mantisse] {\Large 0};
+& \node (f-14) [mantisse] {\Large 1};
+& \node (f-13) [mantisse] {\Large 0};
+& \node (f-12) [mantisse] {\Large 1};
+& \node (f-11) [mantisse] {\Large 1};
+& \node (f-10) [mantisse] {\Large 1};
+& \node (f-9) [mantisse] {\Large 1};
+& \node (f-8) [mantisse] {\Large 1};
+& \node (f-7) [mantisse] {\Large 0};
+& \node (f-6) [mantisse] {\Large 1};
+& \node (f-5) [mantisse] {\Large 1};
+& \node (f-4) [mantisse] {\Large 1};
+& \node (f-3) [mantisse] {\Large 1};
+& \node (f-2) [mantisse] {\Large 1};
+& \node (f-1) [mantisse] {\Large 0};
+& \node (f-0) [mantisse] {\Large 1};  
+\\
+};
+
+% \draw ([shift=({0,0.5cm})]f-16.north) node[above] {\Large \emph{Magic number} $0x5F3759DF$};
+
+\draw ([shift=({0,0cm})]f-0.east) node[right] {\Large $= 0,56395704$};
+
+\end{tikzpicture}
+```
+
+## 
+
+```{.python code-line-numbers="11"}
+def Q_rsqrt(number):
+
+    threehalfs = 1.5
+    
+    x2 = number * 0.5
+    y = np.float32(number)                    
+    i = y.view(np.int32)                          # evil floating point bit level hacking
+    i = np.int32(0x5f3759df) - np.int32(i >> 1)   # what the fuck?
+    y = i.view(np.float32)
+    y = y * (threehalfs - (x2 * y * y))           # 1st iteration
+    # y = y * (threehalfs - (x2 * y * y))           # 2nd iteration, this can be removed
+    
+    return float(y)
+```
+
+La seconde itération de la méthode Newton n'est pas nécessaire.
 
 ```{r engine="tikz", out.width='50%'}
 #| fig-align: "center"
