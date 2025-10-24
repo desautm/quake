@@ -8,6 +8,7 @@ editor: visual
 title-slide-attributes:
   data-background-color: "black"
 highlight-style: github-dark
+mouse-wheel: true
 execute: 
   cache: true
 ---
