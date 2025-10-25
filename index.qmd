@@ -306,7 +306,7 @@ Par exemple:
 
 $$
 \begin{align}
-(14F)_{16} &= 1\cdot 16^2 + 4\cdot 16^1 + 15\cdot 2^0 \\
+(14F)_{16} &= 1\cdot 16^2 + 4\cdot 16^1 + 15\cdot 16^0 \\
 &= (335)_{10}
 \end{align}
 $$
